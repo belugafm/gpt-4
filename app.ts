@@ -38,6 +38,12 @@ function getLatestMessage(messages: MessageObjectT[]): MessageObjectT | null {
         if (message.user_id == myUserId) {
             continue
         }
+        if (message.thread_id) {
+            continue
+        }
+        if (message.user?.bot) {
+            continue
+        }
         if (message.text == null) {
             continue
         }

@@ -152,14 +152,15 @@ interface ImageBitmap {
 }
 
 export class WebSocketClient {
-    ws: WebSocket
+    url: string
+    ws: WebSocket | null
     callback: (channelId: number) => void
     eventListeners: {
         type: keyof WebSocketEventMap
         listener: any
     }[] = []
-    constructor(uri: string, callback: (channelId: number) => void) {
-        this.ws = new WebSocket(uri)
+    constructor(url: string, callback: (channelId: number) => void) {
+        this.url = url
         this.callback = callback
     }
     addEventListener<K extends keyof WebSocketEventMap>(
@@ -171,26 +172,33 @@ export class WebSocketClient {
         this.ws.addEventListener(type, listener)
     }
     removeAllEventListeners() {
-        this.eventListeners.forEach(({ type, listener }) => {
-            // @ts-ignore
-            this.ws.removeEventListener(type, listener)
-        })
-        this.eventListeners = []
+        if (this.ws) {
+            this.eventListeners.forEach(({ type, listener }) => {
+                // @ts-ignore
+                this.ws.removeEventListener(type, listener)
+            })
+            this.eventListeners = []
+        }
     }
     connect() {
         this.removeAllEventListeners()
+        this.ws = new WebSocket(this.url, {
+            perMessageDeflate: false,
+        })
         this.addEventListener("open", (event) => {
             console.log("open websocket")
         })
         this.addEventListener("close", (event) => {
-            console.log("close websocket", event)
+            console.log("close websocket")
             setTimeout(() => {
                 this.connect()
             }, 2000)
         })
         this.addEventListener("error", (event) => {
             console.log("error websocket", event)
-            this.ws.close()
+            if (this.ws) {
+                this.ws.close()
+            }
         })
         this.addEventListener("message", async (event) => {
             try {
@@ -198,7 +206,9 @@ export class WebSocketClient {
                 if (data.channel_id) {
                     this.callback(data.channel_id)
                 }
-            } catch (error) {}
+            } catch (error) {
+                console.error("message error", error)
+            }
         })
     }
 }
