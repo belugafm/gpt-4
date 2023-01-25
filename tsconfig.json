@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "types": ["node"],
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "strictPropertyInitialization": false,
+        "noFallthroughCasesInSwitch": true,
+        "strictFunctionTypes": false,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "target": "es6",
+        "module": "commonjs",
+        "lib": ["ESNext"],
+        "allowJs": false,
+        "declaration": false,
+        "strict": true,
+        "baseUrl": "./",
+        "forceConsistentCasingInFileNames": true,
+        "removeComments": true
+    },
+    "exclude": ["node_modules/**/*"]
+}
