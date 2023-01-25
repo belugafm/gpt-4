@@ -12,6 +12,11 @@ const myUserId = 92
 const myUserName = "gpt3"
 const targetChannelId = 4
 
+console.log(consumerKey)
+console.log(consumerSecret)
+console.log(accessToken)
+console.log(accessTokenSecret)
+
 const configuration = new Configuration({
     organization: process.env.OPENAI_ORGANIZATION,
     apiKey: process.env.OPENAI_API_KEY,
@@ -44,18 +49,16 @@ function getLatestMessage(messages: MessageObjectT[]): MessageObjectT | null {
     return null
 }
 
-function post(methodUrl: string, query: any): Promise<any> {
-    for (const key of Object.keys(query)) {
-        if (query[key] == null) {
-            delete query[key]
+function post(methodUrl: string, body: any): Promise<any> {
+    for (const key of Object.keys(body)) {
+        if (body[key] == null) {
+            delete body[key]
         }
     }
-    const endpointBaseUrl = `https://beluga.fm/api/v1/${methodUrl}`
-    const endpointUrl = new URL(endpointBaseUrl)
-    endpointUrl.search = qs.stringify(query)
+    const endpointUrl = `https://beluga.fm/api/v1/${methodUrl}`
     return new Promise((resolve, reject) => {
         // @ts-ignore
-        oauth.post(endpointUrl.toString(), accessToken, accessTokenSecret, query, function (error, data, res) {
+        oauth.post(endpointUrl, accessToken, accessTokenSecret, body, function (error, data, res) {
             if (error) {
                 reject(error)
             } else {
