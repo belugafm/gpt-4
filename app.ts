@@ -120,11 +120,17 @@ const main = async () => {
             })
             if (answer.data.choices.length > 0) {
                 const obj = answer.data.choices[0]
-                const text = obj.text?.replace(/\n+/g, "").replace(/^\s+/g, "").replace(/\s+$/g, "")
-                await post("message/post", {
-                    channel_id: 4,
-                    text: text,
-                })
+                if (obj.text) {
+                    const text = obj.text
+                        .replace(/^\n+/g, "")
+                        .replace(/\n+$/g, "")
+                        .replace(/^\s+/g, "")
+                        .replace(/\s+$/g, "")
+                    await post("message/post", {
+                        channel_id: 4,
+                        text: text,
+                    })
+                }
             }
         } catch (error) {
             console.error(error)
