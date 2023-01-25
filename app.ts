@@ -119,8 +119,16 @@ const main = async () => {
             }
         } catch (error) {
             console.error(error)
+            await post("message/post", {
+                channel_id: 4,
+                text: "エラー",
+            })
         }
     })
     ws.connect()
+    await post("message/post", {
+        channel_id: 4,
+        text: "起動しました",
+    })
 }
 main()
