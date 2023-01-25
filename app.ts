@@ -110,7 +110,7 @@ const main = async () => {
                 return
             }
             sinceId = latestMessage.id
-            const prompt = `Your name is ${myUserName}. Please respond to "${latestMessage.text}" in Japanese.`
+            const prompt = `Your name is ${myUserName}. Respond to "${latestMessage.text}" in Japanese.`
             console.log(prompt)
             const answer = await openai.createCompletion({
                 model: "text-davinci-003",
