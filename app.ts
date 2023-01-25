@@ -122,10 +122,10 @@ const main = async () => {
                 const obj = answer.data.choices[0]
                 if (obj.text) {
                     const text = obj.text
-                        .replace(/^\n+/g, "")
-                        .replace(/\n+$/g, "")
-                        .replace(/^\s+/g, "")
-                        .replace(/\s+$/g, "")
+                        .replace(/^\n+/, "")
+                        .replace(/\n+$/, "")
+                        .replace(/^\s+/, "")
+                        .replace(/\s+$/, "")
                     await post("message/post", {
                         channel_id: 4,
                         text: text,
