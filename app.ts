@@ -120,10 +120,11 @@ const main = async () => {
         } catch (error) {
             console.error(error)
             try {
-                await post("message/post", {
+                const response = await post("message/post", {
                     channel_id: 4,
                     text: "エラー",
                 })
+                console.log(JSON.parse(response))
             } catch (error) {
                 console.error(error)
             }
@@ -131,10 +132,11 @@ const main = async () => {
     })
     ws.connect()
     try {
-        await post("message/post", {
+        const response = await post("message/post", {
             channel_id: 4,
             text: "起動しました",
         })
+        console.log(JSON.parse(response))
     } catch (error) {
         console.error(error)
     }
