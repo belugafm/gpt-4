@@ -62,7 +62,8 @@ function getPrompt(messages: MessageObjectT[]): string {
     let prompt = `Your name is ${myUserName}.\n`
     for (const message of messages.reverse()) {
         const userName = message.user_id == myUserId ? myUserName : message.user ? message.user.name : message.user_id
-        prompt += `${userName}:${message.text}\n`
+        const text = message.text?.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
+        prompt += `${userName}:${text}\n`
     }
     prompt += `${myUserName}:`
     return prompt
@@ -132,6 +133,7 @@ async function main() {
             }
             lastMessageId = contextMessages[0].id
             const prompt = getPrompt(contextMessages)
+            console.log("Prompt:")
             console.log(prompt)
             const answer = await openai.createCompletion({
                 model: "text-davinci-003",
@@ -147,6 +149,7 @@ async function main() {
                         .replace(/\n+$/, "")
                         .replace(/^\s+/, "")
                         .replace(/\s+$/, "")
+                    console.log("Completion:")
                     console.log(text)
                     await post("message/post", {
                         channel_id: 4,
