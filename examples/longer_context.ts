@@ -34,8 +34,8 @@ const oauth = new OAuth.OAuth(
 )
 
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
-    const maxTextLength = 300
-    const maxMessageCount = 5
+    const maxTextLength = 256
+    const maxMessageCount = 4
     const ret = []
     let sumTextLength = 0
     for (const message of messages) {
@@ -57,12 +57,25 @@ function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     return ret
 }
 
+function getUserName(message: MessageObjectT) {
+    if (message.user_id == myUserId) {
+        return myName
+    }
+    if (message.user == null) {
+        return message.user_id
+    }
+    const { user } = message
+    if (user.display_name && user.display_name.length > 0) {
+        return user.display_name
+    }
+    return user.name
+}
+
 function getPrompt(messages: MessageObjectT[]): string {
     // messagesは降順（最新の投稿が[0]に入っているのでソートする
     let prompt = `Your name is ${myName}.\n`
     for (const message of messages.reverse()) {
-        const userName =
-            message.user_id == myUserId ? myName : message.user ? message.user.display_name : message.user_id
+        const userName = getUserName(message)
         const text = message.text?.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
         prompt += `${userName}:${text}\n`
     }
