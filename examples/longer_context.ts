@@ -9,7 +9,7 @@ const consumerSecret = process.env.CONSUMER_SECRET || ""
 const accessToken = process.env.ACCESS_TOKEN || ""
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || ""
 const myUserId = 92
-const myUserName = "gpt3"
+const myName = "gpt3"
 const targetChannelId = 4
 
 console.log(consumerKey)
@@ -59,13 +59,14 @@ function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
 
 function getPrompt(messages: MessageObjectT[]): string {
     // messagesは降順（最新の投稿が[0]に入っているのでソートする
-    let prompt = `Your name is ${myUserName}.\n`
+    let prompt = `Your name is ${myName}.\n`
     for (const message of messages.reverse()) {
-        const userName = message.user_id == myUserId ? myUserName : message.user ? message.user.name : message.user_id
+        const userName =
+            message.user_id == myUserId ? myName : message.user ? message.user.display_name : message.user_id
         const text = message.text?.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
         prompt += `${userName}:${text}\n`
     }
-    prompt += `${myUserName}:`
+    prompt += `${myName}:`
     return prompt
 }
 
