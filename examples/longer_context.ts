@@ -35,7 +35,7 @@ const oauth = new OAuth.OAuth(
 
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 256
-    const maxMessageCount = 4
+    const maxMessageCount = 5
     const ret = []
     let sumTextLength = 0
     for (const message of messages) {
@@ -47,10 +47,10 @@ function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
         }
         ret.push(message)
         sumTextLength += message.text.length
-        if (sumTextLength > maxTextLength) {
+        if (sumTextLength >= maxTextLength) {
             break
         }
-        if (ret.length > maxMessageCount) {
+        if (ret.length >= maxMessageCount) {
             break
         }
     }
