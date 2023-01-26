@@ -4,7 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "npx ts-node --transpileOnly app.ts"
+        "simple_chat": "npx ts-node --transpileOnly examples/simple_chat.ts",
+        "longer_context": "npx ts-node --transpileOnly examples/longer_context.ts"
     },
     "repository": {
         "type": "git",

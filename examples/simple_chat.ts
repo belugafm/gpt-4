@@ -1,8 +1,8 @@
 import OAuth from "oauth"
 import qs from "querystring"
 import { Configuration, OpenAIApi } from "openai"
-import { WebSocketClient } from "./websocket"
-import { MessageObjectT } from "./object"
+import { WebSocketClient } from "../websocket"
+import { MessageObjectT } from "../object"
 
 const consumerKey = process.env.CONSUMER_KEY || ""
 const consumerSecret = process.env.CONSUMER_SECRET || ""
@@ -93,7 +93,7 @@ function get(methodUrl: string, query: any): Promise<any> {
     })
 }
 
-const main = async () => {
+async function main() {
     let sinceId = 0
     const ws = new WebSocketClient("wss://beluga.fm/ws/", async (channelId) => {
         if (channelId != targetChannelId) {

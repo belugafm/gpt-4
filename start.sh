@@ -1,1 +1,1 @@
-npm start
+npm run longer_context
