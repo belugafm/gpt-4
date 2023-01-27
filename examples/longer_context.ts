@@ -2,7 +2,7 @@ import OAuth from "oauth"
 import qs from "querystring"
 import { Configuration, OpenAIApi } from "openai"
 import { WebSocketClient } from "../websocket"
-import { MessageObjectT } from "../object"
+import { ChannelObjectT, MessageObjectT } from "../object"
 
 const consumerKey = process.env.CONSUMER_KEY || ""
 const consumerSecret = process.env.CONSUMER_SECRET || ""
@@ -10,7 +10,7 @@ const accessToken = process.env.ACCESS_TOKEN || ""
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || ""
 const myUserId = 92
 const myName = "gpt3"
-const targetChannelId = 4
+const targetChannelIds = [4]
 
 console.log(consumerKey)
 console.log(consumerSecret)
@@ -33,17 +33,28 @@ const oauth = new OAuth.OAuth(
     "HMAC-SHA1"
 )
 
+const map_id_to_channel: { [id: number]: ChannelObjectT } = {}
+
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
-    const maxTextLength = 256
-    const maxMessageCount = 5
+    const maxTextLength = 200
+    const maxMessageCount = 5 // 最大何個の投稿を含めるか
+    const untilSeconds = 60 // 最大何秒前の投稿まで含めるか
     const ret = []
     let sumTextLength = 0
+    let latestCreatedAt = 0
     for (const message of messages) {
         if (message.text == null) {
             continue
         }
         if (message.text.length > maxTextLength) {
             continue
+        }
+        if (ret.length == 0) {
+            latestCreatedAt = new Date(message.created_at).getTime()
+        } else {
+            if (latestCreatedAt - new Date(message.created_at).getTime() > untilSeconds * 1000) {
+                break
+            }
         }
         ret.push(message)
         sumTextLength += message.text.length
@@ -71,9 +82,27 @@ function getUserName(message: MessageObjectT) {
     return user.name
 }
 
-function getPrompt(messages: MessageObjectT[]): string {
-    // messagesは降順（最新の投稿が[0]に入っているのでソートする
-    let prompt = `Your name is ${myName}.\n`
+function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string {
+    const today = new Date()
+    const dateString = today.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+        hour: "numeric",
+        minute: "numeric",
+    })
+    const description = channel.description.length > 0 ? `where ${channel.description.slice(0, 100)}` : ""
+    const instruction =
+        "Generate a sentence in the style of a ojou-sama character who is affectionate, using formal and polite language, and feminine expressions such as 'ですわ' and 'しましたわ'."
+    let prompt = `You are ${myName} and chatting users in ${channel.name} channel ${description}.
+Today is ${dateString}.
+${instruction}
+Do not write about how you act.
+When you refer to youself, use 私.
+--
+`
+    // messagesは降順（最新の投稿が[0]に入っているので逆順で処理する
     for (const message of messages.reverse()) {
         const userName = getUserName(message)
         const text = message.text?.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
@@ -124,12 +153,27 @@ function get(methodUrl: string, query: any): Promise<any> {
 async function main() {
     let lastMessageId = 0
     const ws = new WebSocketClient("wss://beluga.fm/ws/", async (channelId) => {
-        if (channelId != targetChannelId) {
+        if (!targetChannelIds.includes(channelId)) {
             return
+        }
+        if (map_id_to_channel[channelId] == null) {
+            try {
+                const response = await get("channel/show", {
+                    id: channelId,
+                })
+                const data = JSON.parse(response)
+                if (data.ok == false) {
+                    throw new Error("Channel not found")
+                }
+                const { channel } = data
+                map_id_to_channel[channelId] = channel
+            } catch (error) {
+                console.error(error)
+            }
         }
         try {
             const response = await get("timeline/channel", {
-                channel_id: targetChannelId,
+                channel_id: channelId,
             })
             const data = JSON.parse(response)
             // 中身は降順になっている
@@ -145,15 +189,20 @@ async function main() {
                 // 自分の投稿には反応しない
                 return
             }
+            const channel = map_id_to_channel[channelId]
+            if (channel == null) {
+                return
+            }
             lastMessageId = contextMessages[0].id
-            const prompt = getPrompt(contextMessages)
-            console.log("Prompt:")
+            const prompt = getPrompt(contextMessages, channel)
+            console.group("Prompt:")
             console.log(prompt)
+            console.groupEnd()
             const answer = await openai.createCompletion({
                 model: "text-davinci-003",
                 prompt: prompt,
                 max_tokens: 256,
-                temperature: 0.9,
+                temperature: 0.5,
             })
             if (answer.data.choices.length > 0) {
                 const obj = answer.data.choices[0]
@@ -163,8 +212,11 @@ async function main() {
                         .replace(/\n+$/, "")
                         .replace(/^\s+/, "")
                         .replace(/\s+$/, "")
-                    console.log("Completion:")
+                        .replace(/^「/, "")
+                        .replace(/」$/, "")
+                    console.group("Completion:")
                     console.log(text)
+                    console.groupEnd()
                     await post("message/post", {
                         channel_id: 4,
                         text: text,
@@ -174,11 +226,10 @@ async function main() {
         } catch (error) {
             console.error(error)
             try {
-                const response = await post("message/post", {
+                await post("message/post", {
                     channel_id: 4,
                     text: "エラー",
                 })
-                console.log(JSON.parse(response))
             } catch (error) {
                 console.dir(error)
                 console.error(error)
@@ -187,13 +238,45 @@ async function main() {
     })
     ws.connect()
     try {
-        const response = await post("message/post", {
+        await post("message/post", {
             channel_id: 4,
             text: "起動しました",
         })
-        console.log(JSON.parse(response))
     } catch (error) {
         console.error(error)
     }
 }
+
+const signals = [
+    "SIGHUP",
+    "SIGINT",
+    "SIGQUIT",
+    "SIGILL",
+    "SIGTRAP",
+    "SIGABRT",
+    "SIGBUS",
+    "SIGFPE",
+    "SIGUSR1",
+    "SIGSEGV",
+    "SIGUSR2",
+    "SIGTERM",
+]
+signals.forEach(function (sig) {
+    process.on(sig, function () {
+        terminator(sig)
+        console.log("signal: " + sig)
+    })
+})
+
+function terminator(sig: string) {
+    if (typeof sig === "string") {
+        post("message/post", {
+            channel_id: 4,
+            text: "停止しました",
+        }).then(() => {
+            process.exit(1)
+        })
+    }
+}
+
 main()

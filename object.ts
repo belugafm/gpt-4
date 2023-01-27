@@ -12,7 +12,7 @@ export type UserObjectT = {
     location: string | null
     url: string | null
     description: string | null
-    created_at: Date
+    created_at: string
     message_count: number
     favorites_count: number
     favorited_count: number
@@ -23,7 +23,7 @@ export type UserObjectT = {
     muted: boolean
     blocked: boolean
     trust_level: number
-    last_activity_date: Date | null
+    last_activity_date: string | null
 }
 
 export type ChannelGroupObjectT = {
@@ -32,7 +32,7 @@ export type ChannelGroupObjectT = {
     unique_name: string
     description: string | null
     image_url: string | null
-    created_at: Date
+    created_at: string
     created_by: UserId
     level: number
     channels_count: number
@@ -61,7 +61,7 @@ export type ChannelObjectT = {
     parent_channel_group_id: number
     parent_channel_group: ChannelGroupObjectT | null
     created_by: UserId
-    created_at: Date
+    created_at: string
     message_count: number
     description: string
     status_string: string
@@ -107,14 +107,14 @@ export type MessageObjectT = {
     user_id: UserId
     user: UserObjectT | null
     text: string | null
-    created_at: Date
+    created_at: string
     favorite_count: number
     favorited: boolean
     like_count: number
     reply_count: number
     thread_id: MessageId | null
     last_reply_message_id: MessageId | null
-    last_reply_message_created_at: Date | null
+    last_reply_message_created_at: string | null
     deleted: boolean
     _internal_updated_at: number // for React
     entities: {
@@ -149,7 +149,7 @@ export type FileObjectT = {
     bytes: number
     original: boolean
     ref_count: number
-    created_at: Date
+    created_at: string
     width: number | null
     height: number | null
     tag: string | null
