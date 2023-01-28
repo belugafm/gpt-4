@@ -92,13 +92,12 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
         hour: "numeric",
         minute: "numeric",
     })
-    const description = channel.description.length > 0 ? `where ${channel.description.slice(0, 100)}` : ""
     const instruction =
-        "Generate a sentence in the style of a ojou-sama character who is affectionate, using formal and polite language, and feminine expressions such as 'ですわ' and 'しましたわ'."
-    let prompt = `You are ${myName} and chatting users in ${channel.name} channel ${description}.
+        "Generate a sentence in the style of a ojou-sama character who uses formal and polite language and feminine expressions such as 'ですわ' and 'ますわ'."
+    let prompt = `You are ${myName} and chatting users in ${channel.name} channel.
 Today is ${dateString}.
 ${instruction}
-Do not write about how you act.
+Do not write about how you generate a sentence.
 When you refer to youself, use 私.
 --
 `
