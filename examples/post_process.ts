@@ -82,16 +82,16 @@ function getUserName(message: MessageObjectT) {
     return user.name
 }
 
-function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string {
-    // const today = new Date()
-    // const dateString = today.toLocaleDateString("ja-JP", {
-    //     year: "numeric",
-    //     month: "long",
-    //     day: "numeric",
-    //     weekday: "long",
-    //     hour: "numeric",
-    //     minute: "numeric",
-    // })
+function getQueryPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string {
+    const today = new Date()
+    const dateString = today.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+        hour: "numeric",
+        minute: "numeric",
+    })
     const userNames = new Set()
     messages.forEach((message) => {
         if (message.user) {
@@ -115,6 +115,13 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
         prompt += `${userName}:${text}\n`
     }
     prompt += `${myName}:`
+    return prompt
+}
+
+function getPostProcessingPrompt(generatedText: string): string {
+    let prompt = `Convert the following text into elegant, ladylike language, including the use of feminine speech forms such as 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ' in a natural way. Do not respond to the text.
+
+${generatedText}`
     return prompt
 }
 
@@ -200,35 +207,62 @@ async function main() {
                 return
             }
             lastMessageId = contextMessages[0].id
-            const prompt = getPrompt(contextMessages, channel)
+            const prompt1 = getQueryPrompt(contextMessages, channel)
             console.group("Prompt:")
-            console.log(prompt)
+            console.log(prompt1)
             console.groupEnd()
-            const answer = await openai.createCompletion({
+            const answer1 = await openai.createCompletion({
                 model: "text-davinci-003",
-                prompt: prompt,
+                prompt: prompt1,
                 max_tokens: 256,
                 temperature: 0.9,
             })
-            if (answer.data.choices.length > 0) {
-                const obj = answer.data.choices[0]
-                if (obj.text) {
-                    const text = obj.text
-                        .replace(/^\n+/, "")
-                        .replace(/\n+$/, "")
-                        .replace(/^\s+/, "")
-                        .replace(/\s+$/, "")
-                        .replace(/^「/, "")
-                        .replace(/」$/, "")
-                    console.group("Completion:")
-                    console.log(text)
-                    console.groupEnd()
-                    await post("message/post", {
-                        channel_id: 4,
-                        text: text,
-                    })
-                }
+            if (answer1.data.choices.length == 0) {
+                return
             }
+            const obj1 = answer1.data.choices[0]
+            if (obj1.text == null) {
+                return
+            }
+            const generatedText = obj1.text
+                .replace(/^\n+/, "")
+                .replace(/\n+$/, "")
+                .replace(/^\s+/, "")
+                .replace(/\s+$/, "")
+            console.group("Completion:")
+            console.log(generatedText)
+            console.groupEnd()
+
+            const prompt2 = getPostProcessingPrompt(generatedText)
+            console.group("Prompt:")
+            console.log(prompt2)
+            console.groupEnd()
+            const answer2 = await openai.createCompletion({
+                model: "text-davinci-003",
+                prompt: prompt2,
+                max_tokens: 256,
+                temperature: 0.9,
+            })
+            if (answer2.data.choices.length == 0) {
+                return
+            }
+            const obj2 = answer2.data.choices[0]
+            if (obj2.text == null) {
+                return
+            }
+            const convertedText = obj2.text
+                .replace(/^\n+/, "")
+                .replace(/\n+$/, "")
+                .replace(/^\s+/, "")
+                .replace(/\s+$/, "")
+            console.group("Conversion:")
+            console.log(convertedText)
+            console.groupEnd()
+
+            await post("message/post", {
+                channel_id: 4,
+                text: convertedText,
+            })
         } catch (error) {
             console.error(error)
             try {
