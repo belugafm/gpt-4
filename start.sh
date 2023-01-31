@@ -1,1 +1,1 @@
-npm run post_process
+npm run longer_context

@@ -83,31 +83,19 @@ function getUserName(message: MessageObjectT) {
 }
 
 function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string {
-    // const today = new Date()
-    // const dateString = today.toLocaleDateString("ja-JP", {
-    //     year: "numeric",
-    //     month: "long",
-    //     day: "numeric",
-    //     weekday: "long",
-    //     hour: "numeric",
-    //     minute: "numeric",
-    // })
     const userNames = new Set()
     messages.forEach((message) => {
         if (message.user) {
             userNames.add(getUserName(message))
         }
     })
-    let prompt = `You are '${myName}.'\n`
-    if (userNames.size > 0) {
-        const userNameStringList = []
-        for (const userName of userNames) {
-            userNameStringList.push(`'${userName}'`)
-        }
-        prompt += userNameStringList.join(",")
-        prompt += " are user names.\n"
-    }
-    prompt += "Insert text.\n\n"
+    let prompt = `Respond to the conversation given after '--' as a young woman.
+The conversation follows the format of 'name:statement' and your name is '${myName}'.
+Act in a manner that exudes intelligence and sophistication, like a knowledgeable woman.
+When you refer to youself, use 私.
+Include the use of feminine speech forms such as 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ' in a natural way.
+--
+`
     // messagesは降順（最新の投稿が[0]に入っているので逆順で処理する
     for (const message of messages.reverse()) {
         const userName = getUserName(message)
