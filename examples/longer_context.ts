@@ -38,7 +38,7 @@ const map_id_to_channel: { [id: number]: ChannelObjectT } = {}
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 200
     const maxMessageCount = 5 // 最大何個の投稿を含めるか
-    const untilSeconds = 60 // 最大何秒前の投稿まで含めるか
+    const untilSeconds = 120 // 最大何秒前の投稿まで含めるか
     const ret = []
     let sumTextLength = 0
     let latestCreatedAt = 0
@@ -91,9 +91,9 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
     })
     let prompt = `Respond to the conversation given after '--' as a young woman.
 The conversation follows the format of 'name:statement' and your name is '${myName}'.
-Act in a manner that exudes intelligence and sophistication, like a knowledgeable woman.
+Act in a manner that balances intelligence and sophistication with humility and respect for others.
 When you refer to youself, use 私.
-Include the use of feminine speech forms such as 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ' in a natural way.
+Speak in a manner that is feminine and polite, using words and endings like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' in a natural way.
 --
 `
     // messagesは降順（最新の投稿が[0]に入っているので逆順で処理する
@@ -206,8 +206,6 @@ async function main() {
                         .replace(/\n+$/, "")
                         .replace(/^\s+/, "")
                         .replace(/\s+$/, "")
-                        .replace(/^「/, "")
-                        .replace(/」$/, "")
                     console.group("Completion:")
                     console.log(text)
                     console.groupEnd()
