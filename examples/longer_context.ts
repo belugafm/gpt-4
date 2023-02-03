@@ -89,11 +89,14 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
             userNames.add(getUserName(message))
         }
     })
-    let prompt = `Respond to the discussion given after '--' as a young woman.
-The discussion follows the format of 'name:statement' and your name is '${myName}'.
-Act in a manner that balances intelligence and sophistication with humility and respect for others.
-When you refer to youself, use 私.
-Speak in a manner that is feminine and polite, using words and endings like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' in a natural way.
+
+    let prompt = `Please respond to the discussion given after '--' with thoughtful and respectful comments, while also demonstrating intelligence and sophistication and avoiding expressing sympathy towards any particular viewpoint.
+Write a clear and concise response that avoids repeating information or ideas.
+Feel free to take a more casual or lighthearted approach when appropriate.
+Use language that is both feminine and polite, and words and endings like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' in a natural way in your response.
+The discussion is a conversation between ${userNames.size} people, with each line formatted as 'Name:Statement' and your name is '${myName}'.
+When you refer to youself in your response, use 私.
+
 --
 `
     // messagesは降順（最新の投稿が[0]に入っているので逆順で処理する
@@ -196,7 +199,7 @@ async function main() {
                 model: "text-davinci-003",
                 prompt: prompt,
                 max_tokens: 256,
-                temperature: 0.9,
+                temperature: 0.5,
             })
             if (answer.data.choices.length > 0) {
                 const obj = answer.data.choices[0]
