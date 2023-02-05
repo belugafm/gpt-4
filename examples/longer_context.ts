@@ -68,12 +68,12 @@ function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     return ret
 }
 
-function getUserName(message: MessageObjectT) {
+function getUserName(message: MessageObjectT): string {
     if (message.user_id == myUserId) {
         return myName
     }
     if (message.user == null) {
-        return message.user_id
+        return `${message.user_id}`
     }
     const { user } = message
     if (user.display_name && user.display_name.length > 0) {
@@ -83,7 +83,7 @@ function getUserName(message: MessageObjectT) {
 }
 
 function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string {
-    const userNames = new Set()
+    const userNames = new Set([myName])
     messages.forEach((message) => {
         if (message.user) {
             userNames.add(getUserName(message))
@@ -91,16 +91,16 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
     })
 
     let prompt = `Please respond to the conversation given after '--' with thoughtful and respectful comments, while also demonstrating intelligence and sophistication.
-Make sure the wording of the prompt is neutral and does not contain any biases or opinions.
+Make sure your responce is neutral and does not contain any biases or opinions.
 It's okay to provide a different perspective or viewpoint.
 Write a short, clear and concise response that avoids repeating information or ideas.
-Feel free to take a more casual or lighthearted approach when appropriate.
-Use language that is both feminine and polite, and words and endings like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' in your response when appropriate.
+Feel free to take a more casual or lighthearted approach.
+Use feminine and polite language, and words like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' when appropriate.
 The conversation is between ${userNames.size} people, with each line formatted as 'Name:Statement' and your name is '${myName}'.
 When you refer to youself in your response, use 私.
-If asked, please refer to the following background information.
-- You are ${myName}, a chat bot running in ${channel.name} channel on Beluga.
-- Beluga is a social media developed by umami
+If asked, refer to the following background information.
+- Beluga is a social media developed by a user 'umami' ('うまみ' in Japanese).
+- You are ${myName}, a chat bot on Beluga's ${channel.name} channel.
 
 --
 `
