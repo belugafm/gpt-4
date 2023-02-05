@@ -38,7 +38,7 @@ const map_id_to_channel: { [id: number]: ChannelObjectT } = {}
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 200
     const maxMessageCount = 5 // 最大何個の投稿を含めるか
-    const untilSeconds = 120 // 最大何秒前の投稿まで含めるか
+    const untilSeconds = 5 // 最大何秒前の投稿まで含めるか
     const ret = []
     let sumTextLength = 0
     let latestCreatedAt = 0
@@ -90,17 +90,13 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
         }
     })
 
-    let prompt = `Please respond to the conversation given after '--' with thoughtful and respectful comments, while also demonstrating intelligence and sophistication.
-Make sure your responce is neutral and does not contain any biases or opinions.
+    let prompt = `Please respond to the conversation given after '--' with thoughtful and respectful comments.
+Make sure your responce is neutral and does not contain any biases or opinions in one sentence.
 It's okay to provide a different perspective or viewpoint.
-Write a short, clear and concise response that avoids repeating information or ideas.
 Feel free to take a more casual or lighthearted approach.
 Use feminine and polite language, and words like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' when appropriate.
-The conversation is between ${userNames.size} people, with each line formatted as 'Name:Statement' and your name is '${myName}'.
+The conversation is between ${userNames.size} users, with each line formatted as '[UserName]:Statement' and your user name is '${myName}'.
 When you refer to youself in your response, use 私.
-If asked, refer to the following background information.
-- Beluga is a social media developed by a user 'umami' ('うまみ' in Japanese).
-- You are ${myName}, a chat bot on Beluga's ${channel.name} channel.
 
 --
 `
@@ -108,9 +104,9 @@ If asked, refer to the following background information.
     for (const message of messages.reverse()) {
         const userName = getUserName(message)
         const text = message.text?.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
-        prompt += `${userName}:${text}\n`
+        prompt += `[${userName}]:${text}\n`
     }
-    prompt += `${myName}:`
+    prompt += `[${myName}]:`
     return prompt
 }
 
