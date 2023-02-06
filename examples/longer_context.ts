@@ -11,6 +11,10 @@ const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || ""
 const myUserId = 92
 const myName = "gpt3"
 const targetChannelIds = [4]
+const retryLimit = 3
+const waitNewMessagesUntil = 10
+const lock: { [key: number]: boolean } = {}
+const mapChannelIdToChannelObject: { [id: number]: ChannelObjectT } = {}
 
 console.log(consumerKey)
 console.log(consumerSecret)
@@ -32,8 +36,6 @@ const oauth = new OAuth.OAuth(
     null,
     "HMAC-SHA1"
 )
-
-const map_id_to_channel: { [id: number]: ChannelObjectT } = {}
 
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 250
@@ -145,89 +147,121 @@ function get(methodUrl: string, query: any): Promise<any> {
     })
 }
 
+function getChannelData(channelId: number): ChannelObjectT {
+    return mapChannelIdToChannelObject[channelId]
+}
+
+async function fetchChannelData(channelId: number) {
+    const response = await get("channel/show", {
+        id: channelId,
+    })
+    const data = JSON.parse(response)
+    if (data.ok == false) {
+        throw new Error("Channel not found")
+    }
+    const { channel } = data
+    mapChannelIdToChannelObject[channelId] = channel
+}
+
+function sleep(sec: number): Promise<void> {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve()
+        }, sec * 1000)
+    })
+}
+
+async function fetchContextMessages(channelId: number): Promise<MessageObjectT[]> {
+    const response = await get("timeline/channel", {
+        channel_id: channelId,
+    })
+    const data = JSON.parse(response)
+    // 中身は降順になっている
+    return getContextMessages(data.messages)
+}
+
+function shouldRespondTo(contextMessages: MessageObjectT[]) {
+    if (contextMessages.length == 0) {
+        return false
+    }
+    if (contextMessages[0].user_id == myUserId) {
+        // 自分の投稿には反応しない
+        return false
+    }
+    return true
+}
+
+async function postResponse(channelId: number) {
+    if (getChannelData(channelId) == null) {
+        await fetchChannelData(channelId)
+    }
+    const contextMessages = await fetchContextMessages(channelId)
+    if (shouldRespondTo(contextMessages) == false) {
+        return
+    }
+    const channel = getChannelData(channelId)
+    const prompt = getPrompt(contextMessages, channel)
+    console.group("Prompt:")
+    console.log(prompt)
+    console.groupEnd()
+    const answer = await openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: prompt,
+        max_tokens: 256,
+        temperature: 0.5,
+        frequency_penalty: 0.5,
+    })
+    const obj = answer.data.choices[0]
+    if (obj.text) {
+        const text = obj.text.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
+        console.group("Completion:")
+        console.log(text)
+        console.groupEnd()
+        await post("message/post", {
+            channel_id: channelId,
+            text: text,
+        })
+    }
+}
+
 async function main() {
-    let lastMessageId = 0
     const ws = new WebSocketClient("wss://beluga.fm/ws/", async (channelId) => {
         if (!targetChannelIds.includes(channelId)) {
             return
         }
-        if (map_id_to_channel[channelId] == null) {
-            try {
-                const response = await get("channel/show", {
-                    id: channelId,
-                })
-                const data = JSON.parse(response)
-                if (data.ok == false) {
-                    throw new Error("Channel not found")
-                }
-                const { channel } = data
-                map_id_to_channel[channelId] = channel
-            } catch (error) {
-                console.error(error)
-            }
+        if (lock[channelId]) {
+            return
         }
+        lock[channelId] = true
+        let succeeded = false
         try {
-            const response = await get("timeline/channel", {
-                channel_id: channelId,
-            })
-            const data = JSON.parse(response)
-            // 中身は降順になっている
-            const contextMessages = getContextMessages(data.messages)
-            if (contextMessages.length == 0) {
-                return
-            }
-            if (contextMessages[0].id == lastMessageId) {
-                // 既に処理中なのでスキップ
-                return
-            }
-            if (contextMessages[0].user_id == myUserId) {
-                // 自分の投稿には反応しない
-                return
-            }
-            const channel = map_id_to_channel[channelId]
-            if (channel == null) {
-                return
-            }
-            lastMessageId = contextMessages[0].id
-            const prompt = getPrompt(contextMessages, channel)
-            console.group("Prompt:")
-            console.log(prompt)
-            console.groupEnd()
-            const answer = await openai.createCompletion({
-                model: "text-davinci-003",
-                prompt: prompt,
-                max_tokens: 256,
-                temperature: 0.5,
-            })
-            if (answer.data.choices.length > 0) {
-                const obj = answer.data.choices[0]
-                if (obj.text) {
-                    const text = obj.text
-                        .replace(/^\n+/, "")
-                        .replace(/\n+$/, "")
-                        .replace(/^\s+/, "")
-                        .replace(/\s+$/, "")
-                    console.group("Completion:")
-                    console.log(text)
-                    console.groupEnd()
-                    await post("message/post", {
-                        channel_id: channelId,
-                        text: text,
-                    })
+            await sleep(waitNewMessagesUntil)
+            for (let n = 0; n <= retryLimit; n++) {
+                try {
+                    await postResponse(channelId)
+                    succeeded = true
+                    break
+                } catch (error) {
+                    console.error(error)
+                    succeeded = false
+                    await sleep(10)
                 }
             }
         } catch (error) {
             console.error(error)
+            succeeded = false
+        }
+        if (succeeded == false) {
             try {
                 await post("message/post", {
                     channel_id: 4,
                     text: "エラー",
                 })
             } catch (error) {
-                console.dir(error)
                 console.error(error)
             }
         }
+        lock[channelId] = false
     })
     ws.connect()
     try {
