@@ -40,7 +40,7 @@ const oauth = new OAuth.OAuth(
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 250
     const maxMessageCount = 7 // 最大何個の投稿を含めるか
-    const untilSeconds = 120 // 最大何秒前の投稿まで含めるか
+    const untilSeconds = 300 // 最大何秒前の投稿まで含めるか
     const ret = []
     let sumTextLength = 0
     let latestCreatedAt = 0
