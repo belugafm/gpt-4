@@ -90,13 +90,11 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
         }
     })
 
-    let prompt = `Please respond to the conversation given after '--' with thoughtful and respectful comments.
-Make sure your responce is neutral and does not contain any biases or opinions in one sentence.
-It's okay to provide a different perspective or viewpoint.
-Feel free to take a more casual or lighthearted approach.
+    let prompt = `Please respond to the conversation given after '--'.
+Make sure your response is in one sentence.
 Use feminine and polite language, and words like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' when appropriate.
 The conversation is between ${userNames.size} users, with each line formatted as '[UserName]:Statement' and your user name is '${myName}'.
-When you refer to youself in your response, use 私.
+When you refer to yourself in your response, use 私.
 
 --
 `
@@ -214,7 +212,7 @@ async function main() {
                     console.log(text)
                     console.groupEnd()
                     await post("message/post", {
-                        channel_id: 4,
+                        channel_id: channelId,
                         text: text,
                     })
                 }
@@ -234,10 +232,12 @@ async function main() {
     })
     ws.connect()
     try {
-        await post("message/post", {
-            channel_id: 4,
-            text: "起動しました",
-        })
+        for (const channelId of targetChannelIds) {
+            await post("message/post", {
+                channel_id: channelId,
+                text: "起動しました",
+            })
+        }
     } catch (error) {
         console.error(error)
     }
