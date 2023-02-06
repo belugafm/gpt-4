@@ -92,7 +92,7 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): string 
 
     let prompt = `Please respond to the conversation given after '--'.
 Use feminine and polite language, and words like 'ですわ', 'ますわ', 'ませんわ', 'ましたわ', 'でしたわ', 'でしょうね' when appropriate.
-The conversation is between ${userNames.size} users, with each line formatted as '[UserName]:Statement' and your user name is '${myName}'.
+The conversation is between ${userNames.size} users, with each line formatted as '[Name]:Statement' and your name is '${myName}'.
 When you refer to yourself in your response, use 私.
 
 --
