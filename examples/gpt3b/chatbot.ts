@@ -237,7 +237,9 @@ async function postResponse(channelId: number) {
     })
     const obj = answer.data.choices[0]
     if (obj.message) {
-        const text = obj.message.content.replace(new RegExp(`\\[?${myName}\\]?:`, "g"), "")
+        const text = obj.message.content
+            .replace(new RegExp(`^\\[?${myName}\\]?:`, "g"), "")
+            .replace(new RegExp(`^\\[?私\\]?:\\s*?`, "g"), "")
         console.group("Chat:")
         console.log(text)
         console.groupEnd()
