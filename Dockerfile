@@ -8,4 +8,3 @@ RUN npm install
 RUN chmod +x ./start.sh
 
 ENV NODE_ENV=production
-CMD ["./start.sh"]

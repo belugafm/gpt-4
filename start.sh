@@ -1,1 +1,0 @@
-npm run gpt3b
