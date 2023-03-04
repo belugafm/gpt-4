@@ -4,9 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "simple_chat": "npx ts-node --transpileOnly examples/simple_chat.ts",
-        "longer_context": "npx ts-node --transpileOnly examples/longer_context.ts",
-        "post_process": "npx ts-node --transpileOnly examples/post_process.ts"
+        "gpt3b": "npx ts-node --transpileOnly examples/gpt3b/chatbot.ts"
     },
     "repository": {
         "type": "git",
