@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "gpt3a": "npx ts-node --transpileOnly examples/gpt3a/chatbot.ts",
         "gpt3b": "npx ts-node --transpileOnly examples/gpt3b/chatbot.ts"
     },
     "repository": {

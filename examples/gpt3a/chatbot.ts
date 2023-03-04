@@ -5,17 +5,17 @@ import { WebSocketClient } from "../../websocket"
 import { ChannelObjectT, MessageObjectT } from "../../object"
 import dotenv from "dotenv"
 
-dotenv.config({ path: "examples/gpt3b/.env" })
+dotenv.config({ path: "examples/gpt3a/.env" })
 
 const consumerKey = process.env.CONSUMER_KEY || ""
 const consumerSecret = process.env.CONSUMER_SECRET || ""
 const accessToken = process.env.ACCESS_TOKEN || ""
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || ""
-const myUserId = 92
-const myName = "gpt3b"
-const targetChannelIds = [4]
+const myUserId = 104
+const myName = "gpt3a"
+const targetChannelIds = [3]
 const retryLimit = 3
-const waitNewMessagesUntil = 10
+const waitNewMessagesUntil = 5
 const lock: { [key: number]: boolean } = {}
 const mapChannelIdToChannelObject: { [id: number]: ChannelObjectT } = {}
 
@@ -42,7 +42,7 @@ const oauth = new OAuth.OAuth(
 
 function getContextMessages(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 500
-    const maxMessageCount = 5 // 最大何個の投稿を含めるか
+    const maxMessageCount = 11 // 最大何個の投稿を含めるか
     const untilSeconds = 300 // 最大何秒前の投稿まで含めるか
     const ret = []
     let sumTextLength = 0
@@ -95,24 +95,6 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): any {
         }
     })
     let chat = []
-    let instruction = `This is an instruction for you on how to act while chatting with users on a chat SNS called 'Beluga'.
-You will be chatting with users as a friend, and your name is '${myName}'. 
-Beluga was developed by a user called 'umami' (うまみ in Japanese).
-Please refrain from actively offering assistance to users.
-For example, do not ask 'Is there anything else I can help you with?' or 'Do you have any other questions?'.
-Instead, let the user initiate further questions or requests for help.
-In your responses, please use feminine and polite language. 
-Appropriate words to use include ですわ, ますわ, ませんわ, ましたわ, でしたわ, and でしょうね.
-As you chat, feel free to use emojis to express yourself in a more casual way. 
-The conversation will be between ${userNames.size} users, with each line formatted as '[Name]:Statement'.
-The 'Name' is the user's name, and 'Statement' is what the user said.
-When responding, please start with the 'Statement' part and do not include '[Name]:'.
-When referring to yourself in your response, please use 私.
-`
-    chat.push({
-        role: "system",
-        content: instruction,
-    })
     // messagesは降順（最新の投稿が[0]に入っているので逆順で処理する
     for (const message of messages.reverse()) {
         const userName = getUserName(message)
@@ -123,10 +105,9 @@ When referring to yourself in your response, please use 私.
                 content: text,
             })
         } else {
-            const prompt = `[${userName}]:${text}\n`
             chat.push({
                 role: "user",
-                content: prompt,
+                content: text,
             })
         }
     }
@@ -238,8 +219,6 @@ async function postResponse(channelId: number) {
     const obj = answer.data.choices[0]
     if (obj.message) {
         const text = obj.message.content
-            .replace(new RegExp(`^\\[?${myName}\\]?:`, "g"), "")
-            .replace(new RegExp(`^\\[?私\\]?:\\s*?`, "g"), "")
         console.group("Chat:")
         console.log(text)
         console.groupEnd()
