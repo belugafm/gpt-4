@@ -2,7 +2,7 @@ version: "3.8"
 services:
     gpt-3a:
         image: gpt-3:latest
-        command: sh -c "npm run gpt3a"
+        command: npm run gpt3a
     gpt-3b:
         image: gpt-3:latest
-        command: sh -c "npm run gpt3b"
+        command: npm run gpt3b
