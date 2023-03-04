@@ -3,20 +3,6 @@ services:
     gpt-3a:
         image: gpt-3:latest
         command: sh -c "npm run gpt3a"
-        environment:
-            - OPENAI_API_KEY
-            - OPENAI_ORGANIZATION
-            - CONSUMER_KEY
-            - CONSUMER_SECRET
-            - ACCESS_TOKEN
-            - ACCESS_TOKEN_SECRET
     gpt-3b:
         image: gpt-3:latest
         command: sh -c "npm run gpt3b"
-        environment:
-            - OPENAI_API_KEY
-            - OPENAI_ORGANIZATION
-            - CONSUMER_KEY
-            - CONSUMER_SECRET
-            - ACCESS_TOKEN
-            - ACCESS_TOKEN_SECRET
