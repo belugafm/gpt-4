@@ -6,3 +6,6 @@ services:
     gpt-3b:
         image: gpt-3:latest
         command: npm run gpt3b
+    gpt-3c:
+        image: gpt-3:latest
+        command: npm run gpt3c

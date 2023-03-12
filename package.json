@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "gpt3a": "npx ts-node --transpileOnly examples/gpt3a/chatbot.ts",
-        "gpt3b": "npx ts-node --transpileOnly examples/gpt3b/chatbot.ts"
+        "gpt3b": "npx ts-node --transpileOnly examples/gpt3b/chatbot.ts",
+        "gpt3c": "npx ts-node --transpileOnly examples/gpt3c/chatbot.ts"
     },
     "repository": {
         "type": "git",
