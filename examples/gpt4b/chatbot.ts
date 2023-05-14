@@ -5,7 +5,7 @@ import { WebSocketClient } from "../../websocket"
 import { ChannelObjectT, MessageObjectT } from "../../object"
 import dotenv from "dotenv"
 
-dotenv.config({ path: "examples/gpt3b/.env" })
+dotenv.config({ path: "examples/gpt4b/.env" })
 
 const consumerKey = process.env.CONSUMER_KEY || ""
 const consumerSecret = process.env.CONSUMER_SECRET || ""
