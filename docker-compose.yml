@@ -1,11 +1,11 @@
 version: "3.8"
 services:
     gpt-3a:
-        image: gpt-3:latest
+        image: gpt-4:latest
         command: npm run gpt3a
-    gpt-3b:
-        image: gpt-3:latest
-        command: npm run gpt3b
+    gpt-4b:
+        image: gpt-4:latest
+        command: npm run gpt4b
     gpt-3c:
-        image: gpt-3:latest
+        image: gpt-4:latest
         command: npm run gpt3c
