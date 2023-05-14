@@ -96,12 +96,11 @@ function getPrompt(messages: MessageObjectT[], channel: ChannelObjectT): any {
     })
     let chat = []
     let now = new Date()
-    let year = now.getFullYear()
-    let month = now.getMonth() + 1 // Note: 0 = January, 11 = December
-    let day = now.getDate()
-    let hours = now.getHours()
-    let minutes = now.getMinutes()
-
+    let year = now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", year: "numeric" })
+    let month = now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", month: "2-digit" })
+    let day = now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", day: "2-digit" })
+    let hours = now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", hour: "2-digit", hour12: false })
+    let minutes = now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", minute: "2-digit" })
     let instruction = `This is an instruction for you on how to act while chatting with users on a chat SNS called 'Beluga'.
 You will be chatting with users as a female, and your name is '${myName}'. 
 Beluga was developed by a user called 'umami' (うまみ in Japanese).
