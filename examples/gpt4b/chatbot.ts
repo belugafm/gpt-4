@@ -109,6 +109,7 @@ async function fetchPageContent(url: string) {
             $("style").remove()
             $("script").remove()
             $("noscript").remove()
+            $("ul").remove()
             $("iframe").remove()
             const title = $("title").text()
             const metaTags = $("meta")
