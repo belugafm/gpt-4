@@ -1,5 +1,6 @@
 FROM node:19
 
+RUN apt install libnss3-dev
 RUN npm install -g npm@latest
 
 COPY . .
