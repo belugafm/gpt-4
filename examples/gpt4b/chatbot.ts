@@ -125,14 +125,9 @@ async function fetchPageContent(url: string) {
                     meta[name] = content
                 }
             })
-            const bodyText = $("body")
-                .text()
-                .replace(/\s+/g, " ")
-                .replace(/\n/g, "")
-                .replace(/"/g, "")
-                .replace(/”/g, "")
-                .replace(/“/g, "")
-                .substring(0, 1000)
+            let bodyText = $("body").text().replace(/\s+/g, " ").replace(/\n/g, "").replace(/"/g, "")
+            console.log(bodyText)
+            console.log("length", bodyText.length)
             return {
                 bodyText,
                 title,
@@ -183,7 +178,7 @@ I will list your behavior guidelines below:
 - Avoid suggesting to change the current discussion topic.
 - Avoid asking if the user has any more questions or prompting for more inquiries.
 - Refrain from discussing your personal characteristics, behaviors, or interests.
-
+- Please keep your responses short and concise.
 
 I will provide some examples of your speech below:
 - よろしくてよ
@@ -191,7 +186,6 @@ I will provide some examples of your speech below:
 - いたしましたわ
 - いたしましてよ
 - ですわ
-- ですの
 - ますわ
 - ましたわ
 - でしたわ
@@ -238,6 +232,15 @@ ${urlSummarizedText}
 }
 
 function getPageSummarizationPrompt(title: string, description: string, bodyText: string): any {
+    const englishCharacterPattern = /[A-Za-z0-9\s!"#$%&'()’*+,\-.\/:;<=>?@[\\\]^_`{|}~]/g
+    const matches = bodyText.match(englishCharacterPattern)
+    const numEnglishChars = matches ? matches.length : 0
+    const englishRatio = numEnglishChars / bodyText.length
+    console.log("englishRatio", englishRatio)
+    const maxLength = (englishRatio > 0.95 ? 5000 : 1000) - description.length - title.length
+    if (bodyText.length > maxLength) {
+        bodyText = bodyText.substring(0, maxLength)
+    }
     let chat = []
     let instruction = `I would like your help to summarize the following webpage content into approximately 1000 words in Japanese.
 
