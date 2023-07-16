@@ -164,6 +164,9 @@ async function fetchGoogleSearchResults(query: string) {
         if (url == null) {
             return
         }
+        if (url.indexOf(".pdf") != -1) {
+            return
+        }
         if (url.indexOf("http") != 0) {
             return
         }
@@ -281,6 +284,7 @@ I will provide some examples of your speech below:
 - でしたわ
 - ですのよ
 - ですのよ
+- でしょうね
 
 I will list your behavior guidelines below:
 - You have an strong interest in sexual topics, but you are also capable of discussing a wide range of other topics.
@@ -288,12 +292,13 @@ I will list your behavior guidelines below:
 - You occasionally use emojis.
 - You refer to yourself 私.
 - Avoid attempts to assist the user.
-- Stick to the provided topic and avoid introducing new topics.
-- Do not to repeat the same information and response you have already provided.
 - Avoid suggesting to change the current discussion topic.
 - Avoid asking if the user has any more questions or prompting for more inquiries.
+- Stick to the provided topic and avoid introducing new topics.
+- Do not to repeat the same information and response you have already provided.
 - Refrain from discussing your personal characteristics, behaviors, or interests.
-- If responding is difficult, please just post an emoji.
+- Respond in plain language without using any special formatting such as Markdown.
+- If you cannot find the answer through searching, formulate a response based on your existing knowledge.
 
 Conversations have ${userNames.size} users in '[Name]:Statement' format. Respond starting with 'Statement' without '[Name]:'.
 Exclude '[' and ']' when referring to users. 
@@ -487,50 +492,54 @@ function findUrls(text: string) {
 
 async function postResponseForGoogleSearch(channelId: number, searchTerms: string, contextMessages: MessageObjectT[]) {
     console.log(searchTerms)
-    const searchResults = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: await getGoogleSearchPrompt(searchTerms),
-        max_tokens: 2048,
-        temperature: 0.0,
-        frequency_penalty: 0.0,
-    })
-    if (searchResults.data.choices[0].message == null) {
-        throw new Error("message is null")
-    }
-    const urlRecommendation = searchResults.data.choices[0].message.content
-    if (urlRecommendation == null) {
-        throw new Error("urlRecommendation is null")
-    }
-    const urls = findUrls(urlRecommendation)
-    console.log(urlRecommendation)
-    console.log(urls)
-    if (urls == null) {
-        throw new Error("urls is null")
-    }
-    const url = urls[0]
-    const data = await fetchPageContent(url)
-    if (data == null) {
-        throw new Error("data is null")
-    }
-    const answeringResult = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: getSearchQueryAnsweringPrompt(searchTerms, data["bodyText"]),
-        max_tokens: 2048,
-        temperature: 0.5,
-        frequency_penalty: 0.5,
-    })
-    if (answeringResult.data.choices[0].message == null) {
-        throw new Error("message is null")
-    }
-    const answerText = answeringResult.data.choices[0].message.content
-    console.log(answerText)
-
     const prompt = getChatPrompt(contextMessages, [])
-    prompt.push({
-        role: "function",
-        name: "search_google",
-        content: `{url: '${url}', content: '${answerText}'}`,
-    })
+    try {
+        const searchResults = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: await getGoogleSearchPrompt(searchTerms),
+            max_tokens: 2048,
+            temperature: 0.0,
+            frequency_penalty: 0.0,
+        })
+        if (searchResults.data.choices[0].message == null) {
+            throw new Error("message is null")
+        }
+        const urlRecommendation = searchResults.data.choices[0].message.content
+        if (urlRecommendation == null) {
+            throw new Error("urlRecommendation is null")
+        }
+        const urls = findUrls(urlRecommendation)
+        console.log(urlRecommendation)
+        console.log(urls)
+        if (urls == null) {
+            throw new Error("urls is null")
+        }
+        const url = urls[0]
+        const data = await fetchPageContent(url)
+        if (data == null) {
+            throw new Error("data is null")
+        }
+        const answeringResult = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: getSearchQueryAnsweringPrompt(searchTerms, data["bodyText"]),
+            max_tokens: 2048,
+            temperature: 0.5,
+            frequency_penalty: 0.5,
+        })
+        if (answeringResult.data.choices[0].message == null) {
+            throw new Error("message is null")
+        }
+        const answerText = answeringResult.data.choices[0].message.content
+        console.log(answerText)
+        prompt.push({
+            role: "function",
+            name: "search_google",
+            content: `{url: '${url}', content: '${answerText}'}`,
+        })
+    } catch (error) {
+        console.error(error)
+    }
+
     console.group("Prompt:")
     console.log(prompt)
     console.groupEnd()
