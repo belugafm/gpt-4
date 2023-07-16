@@ -41,8 +41,10 @@ RUN apt update -y && \
   xdg-utils
 RUN npm install -g npm@latest
 
-COPY . .
 RUN npm install -g ts-node
+COPY package.json .
 RUN npm install
+
+COPY . .
 
 ENV NODE_ENV=production
