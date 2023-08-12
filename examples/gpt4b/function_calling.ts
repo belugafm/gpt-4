@@ -60,7 +60,7 @@ export const functions: GptFunction[] = [
     {
         name: "add_to_favorites",
         description:
-            "This function is designed to add a specific message to your favorites on beluga ONLY if the model deems the message to be of high interest or value based on predefined criteria (e.g., relevance to your interests, originality, positive sentiment). It will require message ID.",
+            "This function is designed to add a specific message to your favorites on beluga ONLY if you consider the message to be of high interest or value based on predefined criteria (e.g., relevance to your interests, originality, positive sentiment). It will require message ID.",
         parameters: {
             type: "object",
             properties: {
