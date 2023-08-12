@@ -1,12 +1,6 @@
 import * as beluga from "./beluga"
-import {
-    getChatPrompt,
-    getGoogleSearchPrompt,
-    getPageSummarizationPrompt,
-    getSearchQueryAnsweringPrompt,
-    getSummarizedTextPrompt,
-} from "./prompt"
-import { fetchPageContent } from "./url_contents"
+import { getChatPrompt, getGoogleSearchPrompt, getSearchQueryAnsweringPrompt, getSummarizedTextPrompt } from "./prompt"
+import { fetchSummarizedPageContent } from "./url_contents"
 import { functions, draw_omikuji } from "./function_calling"
 import { MessageObjectT } from "object"
 import { findUrls, getContextualMessagesFromTimeline, getUserNameFromMessage } from "./utils"
@@ -68,13 +62,17 @@ export async function postResponseForGoogleSearch(channelId: number, searchTerms
         throw new Error("urls is null")
     }
     const url = urls[0]
-    const data = await fetchPageContent(url)
+    const data = await fetchSummarizedPageContent(url)
     if (data == null) {
         throw new Error("data is null")
     }
+    if (data["description"] == null && data["bodyText"] == null) {
+        throw new Error("data is null")
+    }
+    const urlDescription = data["bodyText"] ? data["bodyText"] : data["description"]
     const answeringResult = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: getSearchQueryAnsweringPrompt(searchTerms, data["bodyText"]),
+        messages: getSearchQueryAnsweringPrompt(searchTerms, urlDescription),
         max_tokens: 2048,
         temperature: 0.5,
         frequency_penalty: 0.5,
@@ -103,44 +101,17 @@ export async function postResponseForGoogleSearch(channelId: number, searchTerms
     })
 }
 
-async function fetchUrlSummarizedText(text: string): Promise<string[] | null[]> {
+async function fetchSummaryOfFirstUrlInText(text: string): Promise<string[] | null[]> {
     const urls = findUrls(text)
     if (urls) {
         const url = urls[0]
-        const data = await fetchPageContent(url)
+        const data = await fetchSummarizedPageContent(url)
+        console.log(data)
         if (data) {
-            console.group("Page Content:")
-            console.log(url)
-            console.log(data["bodyText"])
-            console.log(data["meta"])
-            console.log(data["title"])
-            console.groupEnd()
-            const metaTitle = data["meta"]["title"]
-            const metaDescription = data["meta"]["description"]
-            const twitterTitle = data["meta"]["twitter:title"]
-            const twitterDescription = data["meta"]["twitter:description"]
-
-            const title = twitterTitle ? twitterTitle : metaTitle ? metaTitle : data["title"] ? data["title"] : ""
-            const description = twitterDescription ? twitterDescription : metaDescription ? metaDescription : ""
-            const prompt = getPageSummarizationPrompt(title, description, data["bodyText"])
-            console.group("Prompt:")
-            console.log(prompt)
-            console.groupEnd()
-            const answer = await openai.createChatCompletion({
-                model: "gpt-3.5-turbo",
-                messages: prompt,
-                max_tokens: 2048,
-                temperature: 0.5,
-                frequency_penalty: 0.5,
-            })
-            const obj = answer.data.choices[0]
-            if (obj.message && obj.message.content) {
-                const urlSummarizedText = obj.message.content
-                console.group("Summarized Text:")
-                console.log(urlSummarizedText)
-                console.groupEnd()
-                return [url, urlSummarizedText]
+            if (data["bodyText"]) {
+                return [url, data["bodyText"]]
             }
+            return [url, data["description"]]
         }
     }
     return [null, null]
@@ -184,7 +155,8 @@ async function getInitialGptResponse(
     }
     const prompt = getChatPrompt(contextualMessages)
 
-    const [url, urlSummarizedText] = await fetchUrlSummarizedText(latestMessage.text)
+    const [url, urlSummarizedText] = await fetchSummaryOfFirstUrlInText(latestMessage.text)
+    console.log(url, urlSummarizedText)
     const additionalPrompt = url && urlSummarizedText ? getSummarizedTextPrompt(url, urlSummarizedText) : []
     additionalPrompt.forEach((item) => {
         prompt.push(item)

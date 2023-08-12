@@ -11,7 +11,7 @@ export async function fetchGoogleSearchResults(query: string): Promise<string> {
     })
     const page = await browser.newPage()
     await page.goto(url, { waitUntil: "domcontentloaded" })
-    await sleep(5)
+    await sleep(2)
     const content = await page.content()
     await browser.close()
 
