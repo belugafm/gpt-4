@@ -3,7 +3,7 @@ import { getChatPrompt, getGoogleSearchPrompt, getSearchQueryAnsweringPrompt, ge
 import { fetchSummarizedPageContent } from "./url_contents"
 import { functions, draw_omikuji } from "./function_calling"
 import { MessageObjectT } from "object"
-import { findUrls, getContextualMessagesFromTimeline, getUserNameFromMessage } from "./utils"
+import { findUrls, getContextualMessagesFromTimeline, replaceUnnecessaryStringFromText } from "./utils"
 import {
     ChatCompletionRequestMessageFunctionCall,
     ChatCompletionRequestMessageRoleEnum,
@@ -93,7 +93,7 @@ export async function postResponseForGoogleSearch(channelId: number, searchTerms
     if (content == null) {
         throw new Error("message is null")
     }
-    let text = content.replace(new RegExp(`^\\[?${myName}\\]?:`, "g"), "").replace(/^\[?私\]?:(\s*)?/, "")
+    const text = replaceUnnecessaryStringFromText(content)
     console.log("text", text)
     await beluga.sendPostRequest("message/post", {
         channel_id: channelId,
@@ -209,7 +209,7 @@ async function postResponseWithFunctionCallingResult(
                 text: "エラー: content == null",
             })
         }
-        let text = content.replace(new RegExp(`^\\[?${myName}\\]?:`, "g"), "")
+        const text = replaceUnnecessaryStringFromText(content)
         console.group("Completion Result:")
         console.log(text)
         console.groupEnd()
@@ -282,7 +282,7 @@ export async function postResponse(channelId: number) {
         })
     }
     if (responseFunctionCall == null) {
-        let text = responseText.replace(new RegExp(`^\\[?${myName}\\]?:`, "g"), "").replace(/^\[?私\]?:(\s*)?/, "")
+        const text = replaceUnnecessaryStringFromText(responseText)
         console.group("Completion Result:")
         console.log(text)
         console.groupEnd()

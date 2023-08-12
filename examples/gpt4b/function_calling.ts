@@ -60,13 +60,13 @@ export const functions: GptFunction[] = [
     {
         name: "add_to_favorites",
         description:
-            "This function is designed to add a specific message to your favorites on beluga ONLY if you consider the message to be of high interest or value based on predefined criteria (e.g., relevance to your interests, originality, positive sentiment). It will require message ID.",
+            "This function is designed to add a specific message to your favorites on beluga. If you find the message interesting or humorous, please call this function.",
         parameters: {
             type: "object",
             properties: {
                 message_id: {
                     type: "string",
-                    description: "The unique identifier for the post that the user wishes to add to their favorites.",
+                    description: "The unique identifier for the message that you wish to add to your favorites.",
                 },
             },
             required: ["message_id"],

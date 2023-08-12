@@ -57,3 +57,7 @@ export function findUrls(text: string) {
     const urlRegex = /(https?:\/\/[^\s]+)/g
     return text.match(urlRegex)
 }
+
+export function replaceUnnecessaryStringFromText(text: string) {
+    return text.replace(/^\[name=.+, message_id=.+\]:/, "")
+}
