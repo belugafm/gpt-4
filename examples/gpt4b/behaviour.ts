@@ -256,6 +256,12 @@ async function postResponseWithFunctionCallingResult(
             channel_id: channelId,
             text: text,
         })
+    } else if (functionName == "add_to_favorites") {
+        const messageId = functionArguments["message_id"]
+        const res = await beluga.sendPostRequest("favorites/create", {
+            message_id: messageId,
+        })
+        console.log(res)
     }
 }
 

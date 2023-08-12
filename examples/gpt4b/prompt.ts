@@ -31,7 +31,7 @@ export function getChatPrompt(contextualMessages: MessageObjectT[]): PromptT {
                 content: text,
             })
         } else {
-            const prompt = `[${userName}]:${text}\n`
+            const prompt = `[name=${userName}, message_id=${message.id}]:${text}\n`
             chat.push({
                 role: ChatCompletionRequestMessageRoleEnum.User,
                 content: prompt,
