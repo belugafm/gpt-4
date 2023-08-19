@@ -10,7 +10,7 @@ import {
     Configuration,
     OpenAIApi,
 } from "openai"
-import { myName, myUserId } from "./config"
+import { myName, myUserId, skipUserIds } from "./config"
 import { PromptT } from "./types"
 
 const configuration = new Configuration({
@@ -34,6 +34,9 @@ function shouldRespondTo(contextualMessages: MessageObjectT[]) {
     }
     if (contextualMessages[0].user_id == myUserId) {
         // 自分の投稿には反応しない
+        return false
+    }
+    if (skipUserIds.includes(contextualMessages[0].user_id)) {
         return false
     }
     return true
