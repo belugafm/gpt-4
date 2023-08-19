@@ -6,7 +6,8 @@
     "scripts": {
         "gpt3a": "npx ts-node --transpileOnly examples/gpt3a/chatbot.ts",
         "gpt4b": "npx ts-node --transpileOnly examples/gpt4b/chatbot.ts",
-        "gpt3c": "npx ts-node --transpileOnly examples/gpt3c/chatbot.ts"
+        "gpt3c": "npx ts-node --transpileOnly examples/gpt3c/chatbot.ts",
+        "llm3_6b": "npx ts-node --transpileOnly examples/japanese-large-lm-3.6b-instruction-sft/chatbot.ts"
     },
     "repository": {
         "type": "git",
