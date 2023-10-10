@@ -32,6 +32,16 @@ export const functions: GptFunction[] = [
         },
     },
     {
+        name: "get_instruction",
+        description:
+            "This function retrieves the instruction given to you. It can be invoked when a user asks about your character, behavior, or any directives you have been provided with.",
+        parameters: {
+            type: "object",
+            properties: {},
+            required: [],
+        },
+    },
+    {
         name: "draw_omikuji",
         description:
             "This function simulates the act of drawing an omikuji, a traditional Japanese fortune-telling method. When called, it randomly selects a fortune from a predefined list and returns it.",
