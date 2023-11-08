@@ -1,12 +1,12 @@
-import { ChatCompletionRequestMessageRoleEnum } from "openai"
 import { MessageObjectT } from "../../object"
 import { myName } from "./config"
 import { getChatInstruction } from "./instruction"
 import { PromptT } from "./types"
-import { getUserNameFromMessage } from "./utils"
+import { getUserNameFromMessage, splitTextIntoStringsAndImages } from "./utils"
 import { fetchGoogleSearchResults } from "./google_search"
 
 export function getChatPrompt(contextualMessages: MessageObjectT[]): PromptT {
+    console.group("getChatPrompt")
     const userNames = new Set([myName])
     contextualMessages.forEach((message) => {
         if (message.user) {
@@ -15,7 +15,7 @@ export function getChatPrompt(contextualMessages: MessageObjectT[]): PromptT {
     })
     let chat = []
     chat.push({
-        role: ChatCompletionRequestMessageRoleEnum.System,
+        role: "system",
         content: getChatInstruction(contextualMessages),
     })
     // messagesは降順（最新の投稿が[0]に入っているので逆順で処理する
@@ -27,17 +27,39 @@ export function getChatPrompt(contextualMessages: MessageObjectT[]): PromptT {
         const text = message.text?.replace(/^\n+/, "").replace(/\n+$/, "").replace(/^\s+/, "").replace(/\s+$/, "")
         if (userName == myName) {
             chat.push({
-                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                role: "assistant",
                 content: text,
             })
         } else {
-            const prompt = `[name=${userName}, message_id=${message.id}]:${text}\n`
+            const chunks = splitTextIntoStringsAndImages(text)
+            const content = []
+            for (const chunk of chunks) {
+                if (chunk["type"] == "text") {
+                    const text = chunk["text"]
+                    content.push({
+                        type: "text",
+                        text: `[name=${userName}, message_id=${message.id}]:${text}`,
+                    })
+                }
+                if (chunk["type"] == "image_url") {
+                    const url = chunk["image_url"]
+                    content.push({
+                        type: "image_url",
+                        image_url: url,
+                    })
+                }
+            }
+            console.log("content:")
+            console.log(content)
             chat.push({
-                role: ChatCompletionRequestMessageRoleEnum.User,
-                content: prompt,
+                role: "user",
+                content: content,
             })
         }
     }
+    console.log("chat:")
+    console.log(chat)
+    console.groupEnd()
     return chat
 }
 
@@ -65,7 +87,7 @@ Do not mention that you ignored the body text.
 Given this information, could you generate a concise summary of the main points and key details in Japanese?
 `
     chat.push({
-        role: ChatCompletionRequestMessageRoleEnum.System,
+        role: "system",
         content: instruction,
     })
     return chat
@@ -80,7 +102,7 @@ ${bodyText}
 Could you generate a concise summary of the search results in Japanese?
 `
     chat.push({
-        role: ChatCompletionRequestMessageRoleEnum.System,
+        role: "system",
         content: instruction,
     })
     return chat
@@ -105,7 +127,7 @@ Exclude any information other than the URL in the response and output only one U
     console.log(prompt)
     let chat = [
         {
-            role: ChatCompletionRequestMessageRoleEnum.System,
+            role: "system",
             content: prompt,
         },
     ]
@@ -115,7 +137,7 @@ Exclude any information other than the URL in the response and output only one U
 export function getSummarizedTextPrompt(url: string, text: string) {
     return [
         {
-            role: ChatCompletionRequestMessageRoleEnum.System,
+            role: "system",
             content: `Here is the summarized content of '${url}':
 ${text}
 `,

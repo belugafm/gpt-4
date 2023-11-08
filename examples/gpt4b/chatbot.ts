@@ -47,49 +47,49 @@ async function main() {
     })
     ws.connect()
     try {
-        for (const channelId of targetChannelIds) {
-            await beluga.sendPostRequest("message/post", {
-                channel_id: channelId,
-                text: "起動しました",
-            })
-        }
+        // for (const channelId of targetChannelIds) {
+        //     await beluga.sendPostRequest("message/post", {
+        //         channel_id: channelId,
+        //         text: "起動しました",
+        //     })
+        // }
     } catch (error) {
         console.error(error)
     }
 }
 
-const signals = [
-    "SIGHUP",
-    "SIGINT",
-    "SIGQUIT",
-    "SIGILL",
-    "SIGTRAP",
-    "SIGABRT",
-    "SIGBUS",
-    "SIGFPE",
-    "SIGUSR1",
-    "SIGSEGV",
-    "SIGUSR2",
-    "SIGTERM",
-]
-signals.forEach(function (sig) {
-    process.on(sig, function () {
-        terminator(sig)
-        console.log("signal: " + sig)
-    })
-})
+// const signals = [
+//     "SIGHUP",
+//     "SIGINT",
+//     "SIGQUIT",
+//     "SIGILL",
+//     "SIGTRAP",
+//     "SIGABRT",
+//     "SIGBUS",
+//     "SIGFPE",
+//     "SIGUSR1",
+//     "SIGSEGV",
+//     "SIGUSR2",
+//     "SIGTERM",
+// ]
+// signals.forEach(function (sig) {
+//     process.on(sig, function () {
+//         terminator(sig)
+//         console.log("signal: " + sig)
+//     })
+// })
 
-function terminator(sig: string) {
-    if (typeof sig === "string") {
-        beluga
-            .sendPostRequest("message/post", {
-                channel_id: targetChannelIds[0],
-                text: "停止しました",
-            })
-            .then(() => {
-                process.exit(1)
-            })
-    }
-}
+// function terminator(sig: string) {
+//     if (typeof sig === "string") {
+//         beluga
+//             .sendPostRequest("message/post", {
+//                 channel_id: targetChannelIds[0],
+//                 text: "停止しました",
+//             })
+//             .then(() => {
+//                 process.exit(1)
+//             })
+//     }
+// }
 
 main()

@@ -1,3 +1,3 @@
-import { ChatCompletionRequestMessage } from "openai"
+import { OpenAI } from "openai"
 
-export type PromptT = ChatCompletionRequestMessage[]
+export type PromptT = OpenAI.Chat.ChatCompletionMessageParam[]
