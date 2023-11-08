@@ -7,7 +7,7 @@
         "gpt3a": "npx ts-node --transpileOnly examples/gpt3a/chatbot.ts",
         "gpt4b": "npx ts-node --transpileOnly examples/gpt4b/chatbot.ts",
         "gpt3c": "npx ts-node --transpileOnly examples/gpt3c/chatbot.ts",
-        "llm3_6b": "npx ts-node --transpileOnly examples/japanese-large-lm-3.6b-instruction-sft/chatbot.ts"
+        "llm": "npx ts-node --transpileOnly examples/llm/chatbot.ts"
     },
     "repository": {
         "type": "git",
@@ -24,7 +24,7 @@
         "cheerio": "^1.0.0-rc.12",
         "dotenv": "^16.0.3",
         "oauth": "^0.10.0",
-        "openai": "^3.3.0",
+        "openai": "^4.16.1",
         "puppeteer": "^20.5.0",
         "querystring": "^0.2.1",
         "ws": "^8.12.0"
