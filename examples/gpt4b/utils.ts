@@ -25,9 +25,9 @@ export function getUserNameFromMessage(message: MessageObjectT): string {
 }
 
 export function getContextualMessagesFromTimeline(messages: MessageObjectT[]): MessageObjectT[] {
-    const maxTextLength = 600
+    const maxTextLength = 500
     const maxMessageCount = 8 // 最大何個の投稿を含めるか
-    const untilSeconds = 3600 // 最大何秒前の投稿まで含めるか
+    const untilSeconds = 60 * 60 * 6 // 最大何秒前の投稿まで含めるか
     const ret = []
     let sumTextLength = 0
     let latestCreatedAt = 0
