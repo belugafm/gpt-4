@@ -34,6 +34,9 @@ function shouldRespondTo(channelId: number, contextualMessages: MessageObjectT[]
         if (skipUserIds.includes(message.user_id)) {
             skipCount++
         }
+        if (message.user_id == myUserId) {
+            skipCount++
+        }
     }
     if (total == skipCount) {
         return false
