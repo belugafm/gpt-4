@@ -26,7 +26,10 @@ export async function getInitialGptResponse(
     if (url != null && urlSummarizedText != null) {
         prompt.push(...getSummarizedTextPrompt(url, urlSummarizedText))
     }
-    console.log(prompt)
+
+    for (const m of prompt) {
+        console.log(m)
+    }
 
     const body: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
         model: "gpt-4-vision-preview",

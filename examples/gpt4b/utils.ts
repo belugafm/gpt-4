@@ -42,10 +42,10 @@ export function splitTextIntoStringsAndImages(
     const prompt: OpenAI.Chat.ChatCompletionContentPart[] = []
     let cursor = 0
     for (const match of matchResults) {
-        if (!match.index) {
+        if (match.index == null) {
             continue
         }
-        if (cursor != match.index) {
+        if (cursor > 0 && cursor != match.index) {
             const substr = text.substring(cursor, match.index)
             cursor += match.index
             prompt.push({
