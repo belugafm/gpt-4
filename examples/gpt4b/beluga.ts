@@ -54,13 +54,18 @@ export function sendGetRequest(methodUrl: string, query: any): Promise<any> {
     const endpointUrl = new URL(endpointBaseUrl)
     endpointUrl.search = qs.stringify(query)
     return new Promise((resolve, reject) => {
-        oauth.get(endpointUrl.toString(), accessToken, accessTokenSecret, function (error, data, res) {
-            if (error) {
-                reject(error)
-            } else {
-                resolve(data)
+        oauth.get(
+            endpointUrl.toString(),
+            accessToken,
+            accessTokenSecret,
+            function (error, data, res) {
+                if (error) {
+                    reject(error)
+                } else {
+                    resolve(data)
+                }
             }
-        })
+        )
     })
 }
 

@@ -1,18 +1,6 @@
-export type GptFunction = {
-    name: string
-    description: string
-    parameters: {
-        type: string
-        properties: Record<
-            string,
-            {
-                type: string
-                description: string
-            }
-        >
-        required: string[]
-    }
-}
+import { OpenAI } from "openai"
+
+export type GptFunction = OpenAI.Chat.ChatCompletionTool["function"]
 
 export const functions: GptFunction[] = [
     {
@@ -52,22 +40,6 @@ export const functions: GptFunction[] = [
         },
     },
     {
-        name: "recommend_voice_actress",
-        description:
-            "This function takes the name of a randomly chosen female voice actress as an argument and returns detailed information about her.",
-        parameters: {
-            type: "object",
-            properties: {
-                name: {
-                    type: "string",
-                    description:
-                        "This is a string that represents the name of the randomly chosen female voice actress.",
-                },
-            },
-            required: ["name"],
-        },
-    },
-    {
         name: "add_to_favorites",
         description:
             "This function is designed to add a specific message to your favorites on beluga. If you find the message interesting or humorous, please call this function.",
@@ -76,7 +48,8 @@ export const functions: GptFunction[] = [
             properties: {
                 message_id: {
                     type: "string",
-                    description: "The unique identifier for the message that you wish to add to your favorites.",
+                    description:
+                        "The unique identifier for the message that you wish to add to your favorites.",
                 },
             },
             required: ["message_id"],
@@ -84,7 +57,7 @@ export const functions: GptFunction[] = [
     },
 ]
 
-export function draw_omikuji(): string {
+export function drawOmikuji(): string {
     const fortunes: string[] = ["大吉", "中吉", "小吉", "吉", "半吉", "末吉", "凶", "半凶", "大凶"]
     const index: number = Math.floor(Math.random() * fortunes.length)
     return fortunes[index]
