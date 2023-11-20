@@ -65,12 +65,13 @@ export async function getFunctionCallingResult(
         const instruction = functionArguments["instruction_text"]
         console.log("Instruction:", instruction)
         const imageUrl = await getImageGenerationResult(instruction)
+        console.log("imageUrl:", imageUrl)
         if (imageUrl) {
             return [
                 {
                     role: "function",
                     name: "call_dalle3_api",
-                    content: `Image generated successfully. Please inform the user of this URL without using Markdown format: ${imageUrl}`,
+                    content: `Image generated successfully. Please inform the user of this URL: ${imageUrl}`,
                 },
             ]
         } else {
