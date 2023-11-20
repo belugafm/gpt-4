@@ -24,14 +24,17 @@
         "cheerio": "^1.0.0-rc.12",
         "dotenv": "^16.3.1",
         "oauth": "^0.10.0",
+        "oauth-1.0a": "^2.2.6",
         "openai": "^4.19.0",
         "puppeteer": "^20.5.0",
         "querystring": "^0.2.1",
+        "tmp": "^0.2.1",
         "ws": "^8.14.2"
     },
     "devDependencies": {
         "@types/node": "^20.9.2",
         "@types/oauth": "^0.9.4",
+        "@types/tmp": "^0.2.6",
         "@types/ws": "^8.5.9",
         "typescript": "^5.2.2"
     }
