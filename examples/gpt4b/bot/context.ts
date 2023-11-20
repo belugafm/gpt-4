@@ -2,7 +2,7 @@ import * as beluga from "../beluga"
 import { MessageObjectT } from "object"
 
 function getContextualMessagesFromTimeline(messages: MessageObjectT[]): MessageObjectT[] {
-    const maxTextLength = 300
+    const maxTextLength = 500
     const maxMessageCount = 4 // 最大何個の投稿を含めるか
     const untilSeconds = 60 * 60 * 6 // 最大何秒前の投稿まで含めるか
     const ret: MessageObjectT[] = []
