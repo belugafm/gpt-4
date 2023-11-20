@@ -11,12 +11,12 @@ function drawOmikuji(): string {
     return fortunes[index]
 }
 
-export async function getFunctionCallingResult(
+export async function executeFunction(
     responseFunctionCall: OpenAI.Chat.ChatCompletionMessage.FunctionCall
-): Promise<ChatPromptT> {
+): Promise<ChatPromptT | null> {
     const functionName = responseFunctionCall["name"]
     if (responseFunctionCall["arguments"] == null) {
-        return []
+        return null
     }
     const functionArguments = JSON.parse(responseFunctionCall["arguments"])
     if (functionName == "draw_omikuji") {
@@ -40,7 +40,7 @@ export async function getFunctionCallingResult(
                 },
             ]
         } catch (error) {
-            return []
+            return null
         }
     } else if (functionName == "get_instruction") {
         return [
@@ -56,12 +56,7 @@ export async function getFunctionCallingResult(
         await beluga.sendPostRequest("favorites/create", {
             message_id: messageId,
         })
-        return [
-            {
-                role: "system",
-                content: `You added the post with message_id=${messageId} to your favorites. Please explain the reason.`,
-            },
-        ]
+        return null
     } else if (functionName == "call_dalle3_api") {
         const instruction = functionArguments["instruction_text"]
         console.log("Instruction:", instruction)

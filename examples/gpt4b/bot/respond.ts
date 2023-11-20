@@ -4,7 +4,8 @@ import { replaceUnnecessaryStringFromText } from "../utils"
 import { myUserId, skipUserIds } from "../config"
 import { fetchContextualMessages } from "./context"
 import { getInitialGptResponseForText } from "./gpt_response/text"
-import { getGptResponseWithFunctionCallingResult } from "./gpt_response/function_calling"
+import { getGptResponseWithoutCallingFunction } from "./gpt_response/function_calling"
+import { executeFunction } from "./function_calling/results"
 
 let mapChannelIdToLastRepliedMessageId: { [channelId: number]: number } = {}
 
@@ -73,10 +74,12 @@ export async function postResponse(channelId: number) {
         })
     } else {
         try {
-            const responseText = await getGptResponseWithFunctionCallingResult(
-                prompt,
-                responseFunctionCall
-            )
+            const additionalPrompt = await executeFunction(responseFunctionCall)
+            if (additionalPrompt == null) {
+                return
+            }
+            prompt.push(...additionalPrompt)
+            const responseText = await getGptResponseWithoutCallingFunction(prompt)
             const text = replaceUnnecessaryStringFromText(responseText)
             await beluga.sendPostRequest("message/post", {
                 channel_id: channelId,
