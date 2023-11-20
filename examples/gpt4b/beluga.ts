@@ -1,7 +1,10 @@
 import OAuth from "oauth"
 import qs from "querystring"
 import dotenv from "dotenv"
+import axios from "axios"
+import crypto from "crypto"
 import { ChannelObjectT } from "object"
+import OAuth1 from "oauth-1.0a"
 dotenv.config({ path: "examples/gpt4b/.env" })
 
 const consumerKey = process.env.CONSUMER_KEY || ""
@@ -26,6 +29,14 @@ const oauth = new OAuth.OAuth(
     "HMAC-SHA1"
 )
 
+const oauth1 = new OAuth1({
+    consumer: { key: consumerKey, secret: consumerSecret },
+    signature_method: "HMAC-SHA1",
+    hash_function(base_string, key) {
+        return crypto.createHmac("sha1", key).update(base_string).digest("base64")
+    },
+})
+
 export function sendPostRequest(methodUrl: string, body: any): Promise<any> {
     for (const key of Object.keys(body)) {
         if (body[key] == null) {
@@ -44,6 +55,31 @@ export function sendPostRequest(methodUrl: string, body: any): Promise<any> {
         })
     })
 }
+
+export async function postFormData(methodUrl: string, body: any): Promise<any> {
+    const endpointUrl = `https://beluga.fm/api/v1/${methodUrl}`
+    const requestData = {
+        url: endpointUrl,
+        method: "POST",
+        data: body,
+    }
+    const token = {
+        key: accessToken,
+        secret: accessTokenSecret,
+    }
+    const authHeader = oauth1.toHeader(oauth1.authorize(requestData, token))
+    const formData = new FormData()
+    for (const key of Object.keys(body)) {
+        formData.append("key", body[key])
+    }
+    return await axios.post(endpointUrl, body, {
+        headers: {
+            Authorization: authHeader["Authorization"],
+            "content-type": "multipart/form-data",
+        },
+    })
+}
+
 export function sendGetRequest(methodUrl: string, query: any): Promise<any> {
     for (const key of Object.keys(query)) {
         if (query[key] == null) {

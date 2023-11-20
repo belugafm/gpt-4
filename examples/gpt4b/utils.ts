@@ -1,6 +1,46 @@
 import { MessageObjectT } from "object"
 import { myName, myUserId } from "./config"
 import { OpenAI } from "openai"
+import axios from "axios"
+import fs from "fs"
+import tmp from "tmp"
+import * as beluga from "./beluga"
+
+export function createTmpFilename() {
+    return tmp.tmpNameSync()
+}
+
+export async function tryDownloadImage(url: string, filepath: string) {
+    const response = await axios({
+        url,
+        method: "GET",
+        responseType: "stream",
+    })
+    const writer = fs.createWriteStream(filepath)
+    response.data.pipe(writer)
+
+    return new Promise((resolve, reject) => {
+        writer.on("finish", resolve)
+        writer.on("error", reject)
+    })
+}
+
+export async function tryUploadGeneratedImage(origImageUrl: string) {
+    const tmpPath = createTmpFilename()
+    await tryDownloadImage(origImageUrl, tmpPath)
+    const res = await beluga.postFormData("upload/media", {
+        file: fs.readFileSync(tmpPath),
+    })
+    fs.unlinkSync(tmpPath)
+    if (res.data.ok) {
+        for (const file of res.data.files) {
+            if (file.original) {
+                return file.url
+            }
+        }
+    }
+    throw new Error("アップロードに失敗しました")
+}
 
 export function sleep(sec: number): Promise<void> {
     return new Promise((resolve) => {

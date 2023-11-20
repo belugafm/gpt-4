@@ -3,6 +3,7 @@ import { OpenAI } from "openai"
 import { tryGetGptResponseForGoogleSearch } from "../gpt_response/google_search"
 import * as beluga from "../../beluga"
 import { getImageGenerationResult } from "../openai"
+import { tryUploadGeneratedImage } from "../../utils"
 
 function drawOmikuji(): string {
     const fortunes: string[] = ["大吉", "中吉", "小吉", "吉", "半吉", "末吉", "凶", "半凶", "大凶"]
@@ -64,16 +65,29 @@ export async function getFunctionCallingResult(
     } else if (functionName == "call_dalle3_api") {
         const instruction = functionArguments["instruction_text"]
         console.log("Instruction:", instruction)
-        const imageUrl = await getImageGenerationResult(instruction)
-        console.log("imageUrl:", imageUrl)
-        if (imageUrl) {
-            return [
-                {
-                    role: "function",
-                    name: "call_dalle3_api",
-                    content: `Image generated successfully. Please inform the user of this URL: ${imageUrl}`,
-                },
-            ]
+        const origImageUrl = await getImageGenerationResult(instruction)
+        console.log("origImageUrl:", origImageUrl)
+        if (origImageUrl) {
+            try {
+                const imageUrl = await tryUploadGeneratedImage(origImageUrl)
+                console.log("imageUrl:", imageUrl)
+                return [
+                    {
+                        role: "function",
+                        name: "call_dalle3_api",
+                        content: `Image generated successfully. Please inform the user of this URL: ${imageUrl}`,
+                    },
+                ]
+            } catch (error) {
+                return [
+                    {
+                        role: "function",
+                        name: "call_dalle3_api",
+                        content:
+                            "Image generation failed. Please try again with a different instruction.",
+                    },
+                ]
+            }
         } else {
             return [
                 {
