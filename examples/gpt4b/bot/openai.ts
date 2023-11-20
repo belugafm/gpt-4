@@ -10,6 +10,7 @@ export async function getImageGenerationResult(prompt: string): Promise<string |
         model: "dall-e-3",
         prompt: prompt,
         n: 1,
+        quality: "hd",
         size: "1024x1024",
     })
     const imageUrl = response.data[0].url
