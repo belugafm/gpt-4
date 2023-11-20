@@ -70,7 +70,7 @@ export async function executeFunction(
                     {
                         role: "function",
                         name: "call_dalle3_api",
-                        content: `Image generated successfully. Please inform the user of this URL without using Markdown: ${imageUrl}`,
+                        content: `Image generated successfully with given instruction '${instruction}'. Please inform the user of this URL without using Markdown: ${imageUrl}`,
                     },
                 ]
             } catch (error) {
