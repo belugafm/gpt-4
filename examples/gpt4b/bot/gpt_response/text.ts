@@ -5,8 +5,45 @@ import { getChatPrompt } from "../../prompt/chat"
 import { getSummarizedTextPrompt } from "../../prompt/search_results"
 import { getChatCompletionResult } from "../openai"
 import { fetchSummaryOfFirstUrlInText } from "../../url_contents"
+import { functions } from "../function_calling/functions"
 
-export async function getInitialGptResponse(
+function getBody(prompt: ChatPromptT): OpenAI.Chat.Completions.ChatCompletionCreateParams {
+    const bodyForText: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
+        model: "gpt-4-1106-preview",
+        max_tokens: 512,
+        temperature: 0.5,
+        frequency_penalty: 0.5,
+        messages: prompt,
+        functions: functions,
+        function_call: "auto",
+    }
+    const bodyForImage: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
+        model: "gpt-4-vision-preview",
+        max_tokens: 512,
+        temperature: 0.5,
+        frequency_penalty: 0.5,
+        messages: prompt,
+    }
+    const role = prompt[prompt.length - 1]["role"]
+    const content = prompt[prompt.length - 1]["content"]
+    if (content == null) {
+        return bodyForText
+    }
+    if (role != "user") {
+        return bodyForText
+    }
+    if (typeof content == "string") {
+        return bodyForText
+    }
+    for (const part of content) {
+        if (part["type"] == "image_url") {
+            return bodyForImage
+        }
+    }
+    return bodyForText
+}
+
+export async function getInitialGptResponseForText(
     contextualMessages: MessageObjectT[]
 ): Promise<
     | [ChatPromptT, null, OpenAI.Chat.ChatCompletionMessage.FunctionCall]
@@ -31,13 +68,8 @@ export async function getInitialGptResponse(
         console.log(m)
     }
 
-    const body: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
-        model: "gpt-4-vision-preview",
-        max_tokens: 512,
-        temperature: 0.5,
-        frequency_penalty: 0.5,
-        messages: prompt,
-    }
+    const body = getBody(prompt)
+    console.log("Model: ", body["model"])
 
     const [content, functionCall] = await getChatCompletionResult(body)
     if (content == null && functionCall == null) {

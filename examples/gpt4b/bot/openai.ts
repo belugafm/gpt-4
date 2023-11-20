@@ -5,15 +5,20 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 })
 
-// {
-//   model: "gpt-4-vision-preview",
-//   messages: prompt,
-//   max_tokens: 512,
-//   temperature: 0.5,
-//   frequency_penalty: 0.5,
-//   // functions: functions,
-//   // function_call: call_function ? "auto" : "none",
-// }
+export async function getImageGenerationResult(prompt: string): Promise<string | null> {
+    const response = await openai.images.generate({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+    })
+    const imageUrl = response.data[0].url
+    if (imageUrl == null) {
+        return null
+    } else {
+        return imageUrl
+    }
+}
 
 export async function getChatCompletionResult(
     body: OpenAI.Chat.Completions.ChatCompletionCreateParams,

@@ -1,8 +1,14 @@
-import { ChatPromptT } from "../types"
+import { ChatPromptT } from "../../types"
 import { OpenAI } from "openai"
-import { drawOmikuji } from "../function_calling"
-import { tryGetGptResponseForGoogleSearch } from "./gpt_response/google_search"
-import * as beluga from "../beluga"
+import { tryGetGptResponseForGoogleSearch } from "../gpt_response/google_search"
+import * as beluga from "../../beluga"
+import { getImageGenerationResult } from "../openai"
+
+function drawOmikuji(): string {
+    const fortunes: string[] = ["大吉", "中吉", "小吉", "吉", "半吉", "末吉", "凶", "半凶", "大凶"]
+    const index: number = Math.floor(Math.random() * fortunes.length)
+    return fortunes[index]
+}
 
 export async function getFunctionCallingResult(
     responseFunctionCall: OpenAI.Chat.ChatCompletionMessage.FunctionCall
@@ -55,6 +61,28 @@ export async function getFunctionCallingResult(
                 content: `You added the post with message_id=${messageId} to your favorites. Please explain the reason.`,
             },
         ]
+    } else if (functionName == "call_dalle3_api") {
+        const instruction = functionArguments["instruction_text"]
+        console.log("Instruction:", instruction)
+        const imageUrl = await getImageGenerationResult(instruction)
+        if (imageUrl) {
+            return [
+                {
+                    role: "function",
+                    name: "call_dalle3_api",
+                    content: `Image generated successfully. Please inform the user of this URL without using Markdown format: ${imageUrl}`,
+                },
+            ]
+        } else {
+            return [
+                {
+                    role: "function",
+                    name: "call_dalle3_api",
+                    content:
+                        "Image generation failed. Please try again with a different instruction.",
+                },
+            ]
+        }
     } else {
         return []
     }

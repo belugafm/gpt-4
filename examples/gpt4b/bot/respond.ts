@@ -3,7 +3,7 @@ import { MessageObjectT } from "object"
 import { replaceUnnecessaryStringFromText } from "../utils"
 import { myUserId, skipUserIds } from "../config"
 import { fetchContextualMessages } from "./context"
-import { getInitialGptResponse } from "./gpt_response/normal_response"
+import { getInitialGptResponseForText } from "./gpt_response/text"
 import { getGptResponseWithFunctionCallingResult } from "./gpt_response/function_calling"
 
 let mapChannelIdToLastRepliedMessageId: { [channelId: number]: number } = {}
@@ -55,7 +55,7 @@ export async function postResponse(channelId: number) {
     if (shouldRespondTo(channelId, contextualMessages) == false) {
         return
     }
-    const [prompt, responseText, responseFunctionCall] = await getInitialGptResponse(
+    const [prompt, responseText, responseFunctionCall] = await getInitialGptResponseForText(
         contextualMessages
     )
     if (responseText == null && responseFunctionCall == null) {

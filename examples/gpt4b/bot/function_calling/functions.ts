@@ -55,10 +55,20 @@ export const functions: GptFunction[] = [
             required: ["message_id"],
         },
     },
+    {
+        name: "call_dalle3_api",
+        description:
+            "This function is used to invoke the DALLE3 API for the purpose of image generation. It accepts an instruction text provided by the user, which is then sent to DALLE3 to create and return an image based on these instructions.",
+        parameters: {
+            type: "object",
+            properties: {
+                instruction_text: {
+                    type: "string",
+                    description:
+                        "The instruction text to be sent to DALLE3. This text should contain a description of the image that the user wants to generate in English.",
+                },
+            },
+            required: ["instruction_text"],
+        },
+    },
 ]
-
-export function drawOmikuji(): string {
-    const fortunes: string[] = ["大吉", "中吉", "小吉", "吉", "半吉", "末吉", "凶", "半凶", "大凶"]
-    const index: number = Math.floor(Math.random() * fortunes.length)
-    return fortunes[index]
-}

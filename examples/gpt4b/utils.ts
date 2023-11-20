@@ -39,7 +39,7 @@ export function splitTextIntoStringsAndImages(
     const matchResults = [
         ...text.matchAll(/(https:\/\/[^\s]+(\.jpg|\.jpeg|\.png|\.gif|\.webp)[^\s]*)/g),
     ]
-    const prompt: OpenAI.Chat.ChatCompletionContentPart[] = []
+    const content: OpenAI.Chat.ChatCompletionContentPart[] = []
     let cursor = 0
     for (const match of matchResults) {
         if (match.index == null) {
@@ -48,13 +48,13 @@ export function splitTextIntoStringsAndImages(
         if (cursor > 0 && cursor != match.index) {
             const substr = text.substring(cursor, match.index)
             cursor += match.index
-            prompt.push({
+            content.push({
                 text: substr,
                 type: "text",
             })
         }
         const imageUrl: string = match[0]
-        prompt.push({
+        content.push({
             type: "image_url",
             image_url: { url: imageUrl },
         })
@@ -62,10 +62,10 @@ export function splitTextIntoStringsAndImages(
     }
     if (cursor < text.length) {
         const substr = text.substring(cursor, text.length)
-        prompt.push({
+        content.push({
             text: substr,
             type: "text",
         })
     }
-    return prompt
+    return content
 }
