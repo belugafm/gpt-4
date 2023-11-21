@@ -5,6 +5,7 @@ import axios from "axios"
 import fs from "fs"
 import tmp from "tmp"
 import * as beluga from "./beluga"
+import FormData from "form-data"
 
 export function createTmpFilename() {
     return tmp.tmpNameSync()
@@ -28,10 +29,15 @@ export async function tryDownloadImage(url: string, filepath: string) {
 export async function tryUploadGeneratedImage(origImageUrl: string) {
     const tmpPath = createTmpFilename()
     await tryDownloadImage(origImageUrl, tmpPath)
-    const res = await beluga.postFormData("upload/media", {
-        file: fs.readFileSync(tmpPath),
-    })
+
+    const buffer = fs.readFileSync(tmpPath)
+    const file = fs.createReadStream(tmpPath)
+    const formData = new FormData()
+    formData.append("file", file)
+    const res = await beluga.postFormData("upload/media", { file: buffer }, formData)
+
     fs.unlinkSync(tmpPath)
+
     if (res.data.ok) {
         for (const file of res.data.files) {
             if (file.original) {

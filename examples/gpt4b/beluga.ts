@@ -5,6 +5,8 @@ import axios from "axios"
 import crypto from "crypto"
 import { ChannelObjectT } from "object"
 import OAuth1 from "oauth-1.0a"
+import FormData from "form-data"
+
 dotenv.config({ path: "examples/gpt4b/.env" })
 
 const consumerKey = process.env.CONSUMER_KEY || ""
@@ -56,7 +58,7 @@ export function sendPostRequest(methodUrl: string, body: any): Promise<any> {
     })
 }
 
-export async function postFormData(methodUrl: string, body: any): Promise<any> {
+export async function postFormData(methodUrl: string, body: any, form: FormData): Promise<any> {
     const endpointUrl = `https://beluga.fm/api/v1/${methodUrl}`
     const requestData = {
         url: endpointUrl,
@@ -68,11 +70,7 @@ export async function postFormData(methodUrl: string, body: any): Promise<any> {
         secret: accessTokenSecret,
     }
     const authHeader = oauth1.toHeader(oauth1.authorize(requestData, token))
-    const formData = new FormData()
-    for (const key of Object.keys(body)) {
-        formData.append("key", body[key])
-    }
-    return await axios.post(endpointUrl, body, {
+    return await axios.post(endpointUrl, form, {
         headers: {
             Authorization: authHeader["Authorization"],
             "content-type": "multipart/form-data",

@@ -84,6 +84,7 @@ export async function executeFunction(
                     },
                 ]
             } catch (error) {
+                console.error(error)
                 return [
                     {
                         role: "function",
