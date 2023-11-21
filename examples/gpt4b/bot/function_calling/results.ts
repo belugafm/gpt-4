@@ -53,10 +53,20 @@ export async function executeFunction(
         ]
     } else if (functionName == "add_to_favorites") {
         const messageId = functionArguments["message_id"]
-        await beluga.sendPostRequest("favorites/create", {
+        const res = await beluga.sendPostRequest("favorites/create", {
             message_id: messageId,
         })
-        return null
+        if (res.data.ok) {
+            return null
+        } else {
+            return [
+                {
+                    role: "function",
+                    name: "add_to_favorites",
+                    content: "Already added to favorites.",
+                },
+            ]
+        }
     } else if (functionName == "call_dalle3_api") {
         const instruction = functionArguments["instruction_text"]
         console.log("Instruction:", instruction)
