@@ -58,7 +58,7 @@ export const functions: GptFunction[] = [
     {
         name: "call_dalle3_api",
         description:
-            "This function is used to invoke the DALLE3 API for the purpose of image generation. It accepts an instruction text provided by the user, which is then sent to DALLE3 to create and return an image based on these instructions.",
+            "This function is used to invoke the DALLE3 API for the purpose of image generation. It accepts an instruction text provided by the user, which is then sent to DALLE3 to create and return an image based on these instructions. Please call this function upon receiving a request from the user.",
         parameters: {
             type: "object",
             properties: {
