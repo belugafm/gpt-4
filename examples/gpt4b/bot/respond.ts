@@ -74,6 +74,7 @@ export async function postResponse(channelId: number) {
         })
     } else {
         try {
+            console.log("Executing function:", responseFunctionCall["name"])
             const additionalPrompt = await executeFunction(responseFunctionCall)
             if (additionalPrompt == null) {
                 return
