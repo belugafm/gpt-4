@@ -56,9 +56,10 @@ export async function executeFunction(
         const res = await beluga.sendPostRequest("favorites/create", {
             message_id: messageId,
         })
-        if (res.data.ok) {
+        if (res?.data?.ok) {
             return null
         } else {
+            console.error(res)
             return [
                 {
                     role: "function",

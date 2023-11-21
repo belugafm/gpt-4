@@ -87,6 +87,7 @@ export async function postResponse(channelId: number) {
                 text: text,
             })
         } catch (error) {
+            console.error(error)
             await beluga.sendPostRequest("message/post", {
                 channel_id: channelId,
                 text: "エラー: Function Callingの結果を投稿できません",

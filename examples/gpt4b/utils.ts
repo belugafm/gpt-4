@@ -45,6 +45,7 @@ export async function tryUploadGeneratedImage(origImageUrl: string) {
             }
         }
     }
+    console.error(res.data)
     throw new Error("アップロードに失敗しました")
 }
 
