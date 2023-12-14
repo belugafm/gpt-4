@@ -1,5 +1,5 @@
-import * as beluga from "../beluga"
-import { MessageObjectT } from "object"
+import * as beluga from "../../../beluga"
+import { MessageObjectT } from "../../../object"
 
 function getContextualMessagesFromTimeline(messages: MessageObjectT[]): MessageObjectT[] {
     const maxTextLength = 500

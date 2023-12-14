@@ -1,7 +1,7 @@
 import { ChatPromptT } from "../../types"
 import { OpenAI } from "openai"
 import { tryGetGptResponseForGoogleSearch } from "../gpt_response/google_search"
-import * as beluga from "../../beluga"
+import * as beluga from "../../../../beluga"
 import { getImageGenerationResult } from "../openai"
 import { tryUploadGeneratedImage } from "../../utils"
 

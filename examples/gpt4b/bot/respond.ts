@@ -1,5 +1,5 @@
-import * as beluga from "../beluga"
-import { MessageObjectT } from "object"
+import * as beluga from "../../../beluga"
+import { MessageObjectT } from "../../../object"
 import { replaceUnnecessaryStringFromText } from "../utils"
 import { myUserId, skipUserIds } from "../config"
 import { fetchContextualMessages } from "./context"

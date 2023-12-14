@@ -1,4 +1,4 @@
-import * as beluga from "./beluga"
+import * as beluga from "../../beluga"
 import { findUrls } from "./utils"
 
 export async function fetchSummarizedPageContent(url: string) {

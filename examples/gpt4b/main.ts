@@ -1,7 +1,10 @@
+import dotenv from "dotenv"
+dotenv.config({ path: "examples/gpt4b/.env" })
+
 import { WebSocketClient } from "../../websocket"
 import { sleep } from "./utils"
 import { targetChannelIds, retryLimit, waitNewMessagesUntil } from "./config"
-import * as beluga from "./beluga"
+import * as beluga from "../../beluga"
 import { postResponse } from "./bot/respond"
 
 const lock: { [key: number]: boolean } = {}

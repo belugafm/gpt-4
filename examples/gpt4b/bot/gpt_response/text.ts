@@ -1,4 +1,4 @@
-import { MessageObjectT } from "object"
+import { MessageObjectT } from "../../../../object"
 import { ChatPromptT } from "../../types"
 import { OpenAI } from "openai"
 import { getChatPrompt } from "../../prompt/chat"

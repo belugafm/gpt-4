@@ -72,12 +72,6 @@ Respond as concisely as possible.
 }
 
 export function getChatPrompt(contextualMessages: MessageObjectT[]): ChatPromptT {
-    const userNames = new Set([myName])
-    contextualMessages.forEach((message) => {
-        if (message.user) {
-            userNames.add(getUserNameFromMessage(message))
-        }
-    })
     let chat: ChatPromptT = []
     chat.push({
         role: "system",
