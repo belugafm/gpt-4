@@ -131,6 +131,7 @@ dist
 
 # Credentials
 .env
+key.json
 
 .vscode
 package-lock.json
