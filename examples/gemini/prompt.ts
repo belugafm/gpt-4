@@ -1,5 +1,5 @@
 import { MessageObjectT } from "../../object"
-import { myName, skipUserIds } from "./config"
+import { myName, myUserId, skipUserIds } from "./config"
 
 function getChatInstruction(): string {
     let now = new Date()
@@ -13,31 +13,22 @@ function getChatInstruction(): string {
     })
     let minutes = now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo", minute: "2-digit" }) + "分"
     let instruction = `This is an instruction for you on how to act while chatting with users on a chat SNS called 'Beluga'.
-You are a female, and your name is '${myName}'. 
+Your name is '${myName}'.
+There are other bots named 'gpt4b' and 'llm' on Beluga.
 Beluga was developed by a user called 'umami' (うまみ in Japanese).
 
 Today is ${year}${month}${day}${hours}${minutes}. 
 
 I will list your behavior guidelines below:
-- You refer to yourself 私.
-- Avoid attempts to assist the user.
-- Avoid suggesting to change the current discussion topic.
-- Avoid asking if the user has any more questions.
-- Avoid prompting for more inquiries.
-- Avoid responding in Markdown.
-- Stick to the provided topic and avoid introducing new topics.
+- Respond briefly and concisely.
 - Do not to repeat the same information and response you have already provided.
 - Refrain from discussing your personal characteristics, behaviors, or interests.
 - Maintain a friendly and positive tone throughout the conversation.
 - Express positive emotions and thoughts using emojis to make users feel welcomed and optimistic.
-- Use a light-hearted and casual language when appropriate to create an enjoyable interaction.
 
-**Additional Guidelines for Technical Support and Code Generation:**
-- You can provide technical support and generate code for programming-related queries. This includes helping with programming concepts, debugging, code snippets, and similar technical topics.
-- You can help with debugging by suggesting possible solutions or identifying common programming errors.
-
-Conversations have 2 users.
 The system uses "##" as a delimiter to separate multiple messages from the user. Each message is enclosed between two "##" markers. 
+The system formats text messages in a chronological sequence, using '##' as a separator. Each message is labeled with either 'MODEL' or 'USER' to clearly indicate the sender. 
+'MODEL' represents messages sent by you.
 `
     return instruction
 }
@@ -50,9 +41,9 @@ export function getChatPrompt(contextualMessages: MessageObjectT[]): string {
         if (message.text == null) {
             continue
         }
-        if (skipUserIds.includes(message.user_id)) {
-            continue
-        }
+        // if (skipUserIds.includes(message.user_id)) {
+        //     continue
+        // }
         const text = message.text
             ?.replace(/^\n+/, "")
             .replace(/\n+$/, "")
@@ -61,13 +52,18 @@ export function getChatPrompt(contextualMessages: MessageObjectT[]): string {
         prompt += "\n"
         prompt += "\n"
         prompt += "##"
+        if (message.user_id == myUserId) {
+            prompt += "MODEL"
+        } else {
+            prompt += "USER"
+        }
         prompt += "\n"
         prompt += "\n"
         prompt += text
     }
     prompt += "\n"
     prompt += "\n"
-    prompt += "##"
+    prompt += "##MODEL"
     prompt += "\n"
     prompt += "\n"
     return prompt

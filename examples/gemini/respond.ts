@@ -54,6 +54,9 @@ export async function postResponse(channelId: number) {
         return
     }
     const responseText = await getResponseForMessages(contextualMessages)
+    if (responseText == null) {
+        return
+    }
     await beluga.sendPostRequest("message/post", {
         channel_id: channelId,
         text: responseText,

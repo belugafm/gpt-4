@@ -19,17 +19,25 @@ export async function getResponseForText(prompt: string): Promise<any> {
     const chat = generativeModel.startChat({
         generation_config: {
             temperature: 0.9,
+            top_p: 1.0,
         },
     })
-    const result = await chat.sendMessageStream(prompt)
-    let responseText = ""
-    for await (const item of result.stream) {
-        responseText += item.candidates[0].content.parts[0].text
+    const result = await chat.sendMessage(prompt)
+    let responseText = result.response.candidates[0].content.parts[0].text
+    if (responseText == null) {
+        return null
     }
+    // for await (const item of result.response) {
+    //     responseText += item.candidates[0].content.parts[0].text
+    // }
     console.log("Response:")
     console.log(responseText)
-    responseText = responseText.replace(/^##[\s]+/, "")
-    return responseText
+    responseText = responseText
+        .trim()
+        .replace(/^##.+?/, "")
+        .replace(/[\s]+##$/, "")
+    const parts = responseText.split("##")
+    return parts[0]
 }
 
 export async function getResponseForMessages(contextualMessages: MessageObjectT[]): Promise<any> {
