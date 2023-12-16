@@ -9,3 +9,6 @@ services:
     gpt-3c:
         image: gpt-4:latest
         command: npm run gpt3c
+    gemini:
+        image: gpt-4:latest
+        command: npm run gemini
