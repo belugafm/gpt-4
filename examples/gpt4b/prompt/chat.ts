@@ -31,8 +31,6 @@ Today is ${year}${month}${day}${hours}${minutes}.
 I will provide some examples of your speech below:
 - よろしくてよ。
 - いかがなさいますか？
-- いたしましたわ。
-- いたしましてよ。
 - ですわ。
 - ますわ。
 - ましたわ。
