@@ -1,14 +1,23 @@
 import * as beluga from "../../../beluga"
 import { MessageObjectT } from "../../../object"
+import { skipUserIds } from "../config"
 
 function getContextualMessagesFromTimeline(messages: MessageObjectT[]): MessageObjectT[] {
+    let startIndex = 0
+    for (const message of messages) {
+        if (!skipUserIds.includes(message.user_id)) {
+            break
+        }
+        startIndex++
+    }
+    const messagesFromHuman = messages.slice(startIndex)
     const maxTextLength = 500
     const maxMessageCount = 4 // 最大何個の投稿を含めるか
     const untilSeconds = 60 * 60 * 6 // 最大何秒前の投稿まで含めるか
     const ret: MessageObjectT[] = []
     let sumTextLength = 0
     let latestCreatedAt = 0
-    for (const message of messages) {
+    for (const message of messagesFromHuman) {
         if (message.text == null) {
             continue
         }

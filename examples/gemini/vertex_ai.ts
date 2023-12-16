@@ -34,7 +34,7 @@ export async function getResponseForText(prompt: string): Promise<any> {
     console.log(responseText)
     responseText = responseText
         .trim()
-        .replace(/^##.+?/, "")
+        .replace(/^##.+/, "")
         .replace(/[\s]+##$/, "")
     const parts = responseText.split("##")
     return parts[0]
