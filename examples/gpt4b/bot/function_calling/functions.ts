@@ -6,7 +6,7 @@ export const functions: GptFunction[] = [
     {
         name: "search_google",
         description:
-            "This function is designed to take a user's input string, perform a Google search using this string, and return a JSON object that contains both the URL that best matches the search query and the content of that URL.",
+            "This function is designed to take a user's input string, perform a Google search using this string, and return a JSON object that contains both the URL that best matches the search query and the content of that URL. However, try to answer as much as possible within the range of your own knowledge, and avoid calling this function as much as possible.",
         parameters: {
             type: "object",
             properties: {
