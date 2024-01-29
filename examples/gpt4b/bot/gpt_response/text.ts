@@ -9,7 +9,7 @@ import { functions } from "../function_calling/functions"
 
 function getBody(prompt: ChatPromptT): OpenAI.Chat.Completions.ChatCompletionCreateParams {
     const bodyForText: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
-        model: "gpt-4-1106-preview",
+        model: "gpt-4-0125-preview",
         max_tokens: 512,
         temperature: 0.5,
         frequency_penalty: 0.5,
