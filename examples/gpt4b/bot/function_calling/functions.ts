@@ -22,7 +22,7 @@ export const functions: GptFunction[] = [
     {
         name: "get_instruction",
         description:
-            "This function retrieves the instruction given to you. It can be invoked when a user asks about your character, behavior, or any directives you have been provided with.",
+            "This function retrieves the instruction given to you. It can be invoked when a user asks about your character, behavior, or any directives you have been provided with. If you need information on the guidelines and output formats given to you, you must call this function.",
         parameters: {
             type: "object",
             properties: {},
