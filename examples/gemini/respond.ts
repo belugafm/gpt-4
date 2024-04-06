@@ -48,13 +48,16 @@ export async function postResponse(channelId: number) {
     }
     const contextualMessages = await fetchContextualMessages(channelId)
     if (contextualMessages.length == 0) {
+        console.log("Empty contextualMessages")
         return
     }
     if (shouldRespondTo(channelId, contextualMessages) == false) {
+        console.log("No need to respond")
         return
     }
     const responseText = await getResponseForMessages(contextualMessages)
     if (responseText == null) {
+        console.log("responseText is null")
         return
     }
     await beluga.sendPostRequest("message/post", {

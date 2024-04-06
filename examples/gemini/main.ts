@@ -42,9 +42,11 @@ async function main() {
     }
     const ws = new WebSocketClient("wss://beluga.fm/ws/", async (channelId) => {
         if (!targetChannelIds.includes(channelId)) {
+            console.log("Skip", channelId)
             return
         }
         if (lock[channelId]) {
+            console.log("Skip", channelId)
             return
         }
         lock[channelId] = true
