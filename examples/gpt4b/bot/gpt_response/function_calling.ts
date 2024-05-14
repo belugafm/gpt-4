@@ -5,7 +5,7 @@ import { functions } from "../function_calling/functions"
 
 export async function getGptResponseWithoutCallingFunction(prompt: ChatPromptT): Promise<string> {
     const body: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
-        model: "gpt-4-turbo",
+        model: "gpt-4o",
         max_tokens: 512,
         temperature: 0.5,
         frequency_penalty: 0.5,
