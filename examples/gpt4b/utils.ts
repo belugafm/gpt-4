@@ -77,7 +77,7 @@ export function findUrls(text: string) {
 }
 
 export function replaceUnnecessaryStringFromText(text: string) {
-    return text.replace(/^\[name=.+, message_id=.+\]:/, "")
+    return text.replace(/^\[name=.+, message_id=.+\]:/, "").replace(/^MESSAGE_CONTENT:/, "")
 }
 
 export function splitTextIntoStringsAndImages(
